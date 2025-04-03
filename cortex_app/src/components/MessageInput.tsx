@@ -1,4 +1,22 @@
 import { useState, useRef, useEffect } from "react";
+import TermValidationModal from "./TermValidationModal";
+
+
+async function extractEntities(text: string) {
+  const response = await fetch("http://localhost:8000/extract", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ text }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Error al extraer términos");
+  }
+
+  const data = await response.json();
+  return data.entities; 
+}
+
 
 export default function MessageInput() {
   const [text, setText] = useState("");
@@ -6,6 +24,9 @@ export default function MessageInput() {
   const [highlightedFragments, setHighlightedFragments] = useState<Array<{text: string, confirmed: boolean}>>([]);
   const [isProcessed, setIsProcessed] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
+
+  const [selectedFragmentIndex, setSelectedFragmentIndex] = useState<number | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
   
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -13,28 +34,45 @@ export default function MessageInput() {
   const allFragmentsConfirmed = highlightedFragments.length > 0 && 
     highlightedFragments.every(fragment => fragment.confirmed);
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (text.trim() === "") return;
     
     if (!isProcessed) {
-      // Primera pulsación: Simulación de la respuesta del backend
-      setText("Patients diagnosed in the lower inner quadrant of breast that went under lumpectomy");
-      setHighlightedFragments([
-        { text: "inner quadrant of breast", confirmed: false },
-        { text: "lumpectomy", confirmed: false },
-      ]);
-      setIsProcessed(true);
+      try {
+        const entities = await extractEntities(text);
+  
+        const fragments = entities.map((e: any) => ({
+          text: e.word,
+          confirmed: false,
+        }));
+  
+        setHighlightedFragments(fragments);
+        setIsProcessed(true);
+      } catch (err) {
+        console.error("Error al extraer entidades:", err);
+
+      }
     } else if (allFragmentsConfirmed) {
-      // Segunda pulsación: Todos los fragmentos están confirmados, ejecutar la consulta
       console.log("Ejecutando consulta SQL...");
-      // Aquí iría la lógica para enviar al backend
     }
   };
 
   const handleConfirmFragment = (index: number) => {
+    setSelectedFragmentIndex(index);
+    setModalOpen(true);
+  };
+
+  const handleTermConfirm = (selectedTerms: any[]) => {
+    if (selectedFragmentIndex === null) return;
     const updatedFragments = [...highlightedFragments];
-    updatedFragments[index].confirmed = !updatedFragments[index].confirmed;
+  
+    updatedFragments[selectedFragmentIndex] = {
+      ...updatedFragments[selectedFragmentIndex],
+      confirmed: true,
+      // snomed: selectedTerms, 
+    };
     setHighlightedFragments(updatedFragments);
+    setSelectedFragmentIndex(null);
   };
 
   // Función para renderizar el texto con los fragmentos resaltados
@@ -44,7 +82,7 @@ export default function MessageInput() {
     let result = [];
     let currentText = text;
 
-    // Ordenamos los fragmentos por su posición en el texto para procesarlos secuencialmente
+    
     const sortedFragments = [...highlightedFragments]
       .map((fragment, index) => ({ ...fragment, index }))
       .sort((a, b) => text.indexOf(a.text) - text.indexOf(b.text));
@@ -64,7 +102,7 @@ export default function MessageInput() {
         );
       }
 
-      // Fragmento resaltado - Hacemos el padding más pequeño
+      // Fragmento resaltado 
       result.push(
         <button
           key={`fragment-${fragment.index}`}
@@ -107,6 +145,7 @@ export default function MessageInput() {
   }, [text, isProcessed]);
 
   return (
+    <>
     <div className="input-area flex flex-col w-full">
       <div className="flex-grow bg-transparent p-4 min-h-[100px] relative">
         {isProcessed ? (
@@ -180,5 +219,17 @@ export default function MessageInput() {
         </div>
       </div>
     </div>
+
+
+    <TermValidationModal
+      term={highlightedFragments[selectedFragmentIndex!]?.text || ""}
+      isOpen={modalOpen}
+      onClose={() => setModalOpen(false)}
+      onConfirm={handleTermConfirm}
+    />
+    </>
   );
+
+  
 }
+
