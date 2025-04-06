@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect } from "react";
 import TermValidationModal from "./TermValidationModal";
+import config from "../config";
 
 
 async function extractEntities(text: string) {
-  const response = await fetch("http://localhost:8000/extract", {
+  const response = await fetch(`${config.API_BASE_URL}/extract`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ text }),

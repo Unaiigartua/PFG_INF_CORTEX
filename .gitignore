@@ -1,0 +1,25 @@
+# Logs
+cortex_app/logs
+cortex_app/*.log
+cortex_app/npm-debug.log*
+cortex_app/yarn-debug.log*
+cortex_app/yarn-error.log*
+cortex_app/pnpm-debug.log*
+cortex_app/lerna-debug.log*
+
+cortex_app/node_modules
+cortex_app/dist
+cortex_app/dist-ssr
+cortex_app/*.local
+
+# Editor directories and files
+cortex_app/.vscode/*
+cortex_app/!.vscode/extensions.json
+cortex_app/.idea
+cortex_app/.DS_Store
+cortex_app/*.suo
+cortex_app/*.ntvs*
+cortex_app/*.njsproj
+cortex_app/*.sln
+cortex_app/*.sw?
+cortex_back/app/OMOP_SNOMED/*
