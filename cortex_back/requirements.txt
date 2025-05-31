@@ -3,3 +3,8 @@ uvicorn
 transformers
 torch
 scikit-learn
+sqlalchemy
+python-jose
+pydantic
+passlib
+pytest

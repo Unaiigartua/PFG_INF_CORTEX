@@ -1,3 +1,4 @@
+import { useState } from "react";
 import Header from "../components/Header.tsx";
 import Logo from "../components/Logo.tsx";
 import MessageInput from "../components/MessageInput.tsx";
@@ -5,13 +6,19 @@ import ExamplesList from "../components/ExamplesList.tsx";
 import FooterDisclaimer from "../components/FooterDisclaimer.tsx";
 import HistoryButton from "../components/HistoryButton.tsx";
 
-export default function Home() {
+interface HomeProps {
+  onLoginClick: () => void;
+}
+
+export default function Home({ onLoginClick }: HomeProps) {
+  const [currentQuery, setCurrentQuery] = useState("");
+
   return (
     <div className="min-h-screen bg-[#eaf3f3] flex flex-col">
       {/* Barra de navegación con efecto de cristal */}
       <div className="w-full flex justify-between items-center p-4 bg-white/30 backdrop-blur-sm sticky top-0 z-10 shadow-sm">
-        <HistoryButton />
-        <Header />
+        <HistoryButton onSelectQuery={setCurrentQuery} />
+        <Header onLoginClick={onLoginClick} />
       </div>
       
       {/* Contenido principal */}
@@ -23,12 +30,12 @@ export default function Home() {
         
         {/* Input de mensaje con sombras mejoradas */}
         <div className="w-full max-w-3xl mb-8">
-          <MessageInput />
+          <MessageInput initialQuery={currentQuery} />
         </div>
         
         {/* Ejemplos con estilo de tarjeta */}
         <div className="w-full max-w-3xl">
-          <ExamplesList />
+          <ExamplesList onSelectExample={setCurrentQuery} />
         </div>
       </div>
       

@@ -1,12 +1,19 @@
 import { useState, useRef, useEffect } from "react";
 import TermValidationModal from "./TermValidationModal";
 import config from "../config";
+import { useAuth } from "../context/AuthContext";
 
+async function extractEntities(text: string, token: string | null) {
+  const headers: HeadersInit = { "Content-Type": "application/json" };
+  
+  // Add authorization header if token exists
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
 
-async function extractEntities(text: string) {
   const response = await fetch(`${config.API_BASE_URL}/extract`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers,
     body: JSON.stringify({ text }),
   });
 
@@ -18,9 +25,30 @@ async function extractEntities(text: string) {
   return data.entities; 
 }
 
+// Add support for saving queries to history
+async function saveQueryToHistory(query: string, token: string | null) {
+  if (!token) return; // Only save if authenticated
+  
+  try {
+    await fetch(`${config.API_BASE_URL}/queries/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify({ query_text: query }),
+    });
+  } catch (error) {
+    console.error("Error saving query to history:", error);
+  }
+}
 
-export default function MessageInput() {
-  const [text, setText] = useState("");
+interface MessageInputProps {
+  initialQuery?: string;
+}
+
+export default function MessageInput({ initialQuery = "" }: MessageInputProps) {
+  const [text, setText] = useState(initialQuery);
   const [isFocused, setIsFocused] = useState(false);
   const [highlightedFragments, setHighlightedFragments] = useState<Array<{text: string, confirmed: boolean}>>([]);
   const [isProcessed, setIsProcessed] = useState(false);
@@ -30,6 +58,18 @@ export default function MessageInput() {
   const [modalOpen, setModalOpen] = useState(false);
   
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const { token, isAuthenticated } = useAuth();
+
+  // Handle initialQuery changes
+  useEffect(() => {
+    if (initialQuery && !isProcessed) {
+      setText(initialQuery);
+      // Focus the textarea after setting the text
+      if (textareaRef.current) {
+        textareaRef.current.focus();
+      }
+    }
+  }, [initialQuery, isProcessed]);
 
   // Verificar si todos los fragmentos están confirmados
   const allFragmentsConfirmed = highlightedFragments.length > 0 && 
@@ -40,7 +80,7 @@ export default function MessageInput() {
     
     if (!isProcessed) {
       try {
-        const entities = await extractEntities(text);
+        const entities = await extractEntities(text, token);
   
         const fragments = entities.map((e: any) => ({
           text: e.word,
@@ -49,9 +89,13 @@ export default function MessageInput() {
   
         setHighlightedFragments(fragments);
         setIsProcessed(true);
+        
+        // Save to history if authenticated
+        if (isAuthenticated) {
+          saveQueryToHistory(text, token);
+        }
       } catch (err) {
         console.error("Error al extraer entidades:", err);
-
       }
     } else if (allFragmentsConfirmed) {
       console.log("Ejecutando consulta SQL...");
@@ -230,7 +274,4 @@ export default function MessageInput() {
     />
     </>
   );
-
-  
 }
-

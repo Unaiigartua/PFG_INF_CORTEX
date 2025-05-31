@@ -23,3 +23,4 @@ cortex_app/*.njsproj
 cortex_app/*.sln
 cortex_app/*.sw?
 cortex_back/app/OMOP_SNOMED/*
+cortex_app/src/config.ts
