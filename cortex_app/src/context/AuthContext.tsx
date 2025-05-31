@@ -23,67 +23,112 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Load authentication state from localStorage on startup
-  useEffect(() => {
-    const storedToken = localStorage.getItem("auth_token");
-    
-    if (storedToken) {
-      setToken(storedToken);
-      // Try to load user data
-      const userData = localStorage.getItem("user_data");
-      if (userData) {
-        try {
-          setUser(JSON.parse(userData));
-        } catch (e) {
-          console.error("Failed to parse user data", e);
-        }
-      }
-    }
-    
-    setIsLoading(false);
-  }, []);
-
   // Function to get user data with the token
   const fetchUserData = async (authToken: string): Promise<User | null> => {
     try {
-      // This endpoint should return the current user data
-      // You might need to implement this in your backend
       const response = await fetch(`${config.API_BASE_URL}/auth/me`, {
         headers: {
           Authorization: `Bearer ${authToken}`,
+          "ngrok-skip-browser-warning": "true",
+          "Content-Type": "application/json",
         },
       });
 
       if (response.ok) {
         const userData = await response.json();
         return userData;
+      } else {
+        console.error("Error al obtener datos del usuario:", response.status);
+        return null;
       }
-      return null;
     } catch (e) {
       console.error("Error fetching user data", e);
       return null;
     }
   };
 
+  // Load authentication state from localStorage on startup
+  useEffect(() => {
+    const loadAuthState = async () => {
+      try {
+        const storedToken = localStorage.getItem("auth_token");
+        console.log("Token cargado desde localStorage:", !!storedToken);
+        
+        if (storedToken) {
+          setToken(storedToken);
+          
+          // Try to load user data from localStorage first
+          const userData = localStorage.getItem("user_data");
+          if (userData) {
+            try {
+              const parsedUser = JSON.parse(userData);
+              console.log("Usuario cargado desde localStorage:", parsedUser);
+              setUser(parsedUser);
+            } catch (e) {
+              console.error("Failed to parse user data", e);
+            }
+          }
+          
+          // If no user data in localStorage, fetch from API
+          if (!userData) {
+            const fetchedUser = await fetchUserData(storedToken);
+            if (fetchedUser) {
+              setUser(fetchedUser);
+              try {
+                localStorage.setItem("user_data", JSON.stringify(fetchedUser));
+              } catch (e) {
+                console.log("No se pudo guardar usuario en localStorage");
+              }
+            }
+          }
+        }
+      } catch (e) {
+        console.log("localStorage no disponible");
+      }
+      
+      setIsLoading(false);
+    };
+
+    loadAuthState();
+  }, []);
+
   const login = async (newToken: string) => {
+    console.log("Iniciando login con token:", !!newToken);
     setToken(newToken);
-    localStorage.setItem("auth_token", newToken);
+    
+    try {
+      localStorage.setItem("auth_token", newToken);
+    } catch (e) {
+      console.log("No se pudo guardar en localStorage");
+    }
     
     // Intentar extraer información del usuario del token JWT
     try {
       const base64Url = newToken.split('.')[1];
       const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
       const payload = JSON.parse(window.atob(base64));
+      console.log("Payload del token:", payload);
       
-      if (payload.sub) {
-        const userData = {
-          id: payload.user_id || 0,
-          email: payload.sub,
-          is_active: true
-        };
-        
-        setUser(userData);
-        localStorage.setItem("user_data", JSON.stringify(userData));
+      // Si tenemos user_id en el payload, intentar obtener los datos del usuario
+      if (payload.user_id) {
+        const fetchedUser = await fetchUserData(newToken);
+        if (fetchedUser) {
+          setUser(fetchedUser);
+          try {
+            localStorage.setItem("user_data", JSON.stringify(fetchedUser));
+          } catch (e) {
+            console.log("No se pudo guardar usuario en localStorage");
+          }
+        } else {
+          // Fallback: crear un usuario básico con el user_id
+          const fallbackUser = {
+            id: payload.user_id,
+            email: `user${payload.user_id}@example.com`, // Email temporal
+            is_active: true
+          };
+          console.log("Usando usuario fallback:", fallbackUser);
+          setUser(fallbackUser);
+        }
       }
     } catch (e) {
       console.error("Error decoding token", e);
@@ -91,16 +136,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = () => {
-    localStorage.removeItem("auth_token");
-    localStorage.removeItem("user_data");
+    console.log("Cerrando sesión");
+    try {
+      localStorage.removeItem("auth_token");
+      localStorage.removeItem("user_data");
+    } catch (e) {
+      console.log("No se pudo limpiar localStorage");
+    }
     setToken(null);
     setUser(null);
   };
 
+  const isAuthenticated = !!token;
+  console.log("Estado de autenticación:", { isAuthenticated, hasUser: !!user, hasToken: !!token });
+
   return (
     <AuthContext.Provider
       value={{
-        isAuthenticated: !!token,
+        isAuthenticated,
         token,
         user,
         login,

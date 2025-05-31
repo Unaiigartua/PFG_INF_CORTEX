@@ -17,9 +17,17 @@ export default function Home({ onLoginClick }: HomeProps) {
     <div className="min-h-screen bg-[#eaf3f3] flex flex-col">
       {/* Barra de navegación con efecto de cristal */}
       <div className="w-full flex justify-between items-center p-4 bg-white/30 backdrop-blur-sm sticky top-0 z-10 shadow-sm">
-        <HistoryButton onSelectQuery={setCurrentQuery} />
-        <Header onLoginClick={onLoginClick} />
+        {/* Contenedor izquierdo con margen */}
+        <div className="flex-1 flex justify-start pl-4 md:pl-8">
+          <HistoryButton onSelectQuery={setCurrentQuery} />
+        </div>
+        
+        {/* Contenedor derecho con margen */}
+        <div className="flex-1 flex justify-end pr-4 md:pr-8">
+          <Header onLoginClick={onLoginClick} />
+        </div>
       </div>
+
       
       {/* Contenido principal */}
       <div className="flex flex-col items-center justify-center flex-grow px-4 py-8">

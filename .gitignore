@@ -24,3 +24,23 @@ cortex_app/*.sln
 cortex_app/*.sw?
 cortex_back/app/OMOP_SNOMED/*
 cortex_app/src/config.ts
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyc
+# Database
+*.db
+*.sqlite3
+
+# Environment
+.env
+.venv/
+!.env.example
+
+# Node modules
+node_modules/
+
+# Build files
+dist/
+build/

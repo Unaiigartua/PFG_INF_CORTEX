@@ -35,6 +35,13 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
     token = security.create_access_token({"user_id": user.id})
     return {"access_token": token, "token_type": "bearer"}
 
+
+@router.get("/me", response_model=auth_schemas.UserOut)
+def get_me(token: str = Depends(oauth2_scheme), db: Session = Depends(get_auth_db)):
+    """Obtener información del usuario autenticado"""
+    current_user = get_current_user(token, db)
+    return current_user
+
 # Dependencia para rutas protegidas
 def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_auth_db)):
     creds_exc = HTTPException(

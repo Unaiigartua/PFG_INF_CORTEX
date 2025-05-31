@@ -17,8 +17,9 @@ from app.auth_routes import router as auth_router
 from app.query_routes import router as query_router
 from app.auth_database import Base as AuthBase, engine as auth_engine
 
-# (Opcional) Si quieres asegurarte de crear también tu esquema principal:
-# from app.database import Base as MainBase, engine as main_engine
+from dotenv import load_dotenv
+load_dotenv() 
+
 
 app = FastAPI(title="Mi API con Auth + Logs")
 
