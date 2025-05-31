@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { Send, RefreshCw, CheckCircle, Circle } from "lucide-react";
 import TermValidationModal from "./TermValidationModal";
 import config from "../config";
 import { useAuth } from "../context/AuthContext";
@@ -152,16 +153,18 @@ export default function MessageInput({ initialQuery = "" }: MessageInputProps) {
         <button
           key={`fragment-${fragment.index}`}
           onClick={() => handleConfirmFragment(fragment.index)}
-          className="mx-1 px-1.5 py-0.5 bg-gray-200 rounded-md inline-flex items-center text-gray-900 cursor-pointer"
+          className={`mx-1 px-3 py-1.5 rounded-lg inline-flex items-center gap-2 text-sm cursor-pointer transition-all duration-200 transform hover:scale-105 font-medium ${
+            fragment.confirmed 
+              ? 'bg-[var(--color-success)]/20 border border-[var(--color-success)]/40 text-[var(--color-success)] shadow-sm' 
+              : 'bg-[var(--color-secondary)]/20 border border-[var(--color-secondary)]/40 text-[var(--color-secondary-dark)] hover:bg-[var(--color-secondary)]/30 shadow-sm'
+          }`}
         >
           {fragment.text}
-          <span className="material-icons ml-1 text-sm">
-            {fragment.confirmed ? (
-              <span className="material-icons text-green-500">check_circle</span>
-            ) : (
-              <span className="material-icons text-amber-500">warning</span>
-            )}
-          </span>
+          {fragment.confirmed ? (
+            <CheckCircle className="icon-sm text-[var(--color-success)]" />
+          ) : (
+            <Circle className="icon-sm text-[var(--color-secondary-dark)]" />
+          )}
         </button>
       );
 
@@ -182,42 +185,40 @@ export default function MessageInput({ initialQuery = "" }: MessageInputProps) {
 
   useEffect(() => {
     if (textareaRef.current && !isProcessed) {
-      // Reset height para evitar que solo crezca
-      textareaRef.current.style.height = "auto";
-      // Establecer la altura basada en el contenido
-      textareaRef.current.style.height = textareaRef.current.scrollHeight + "px";
+      // Mantener altura fija en lugar de auto-resize
+      textareaRef.current.style.height = "80px";
     }
   }, [text, isProcessed]);
 
   return (
     <>
     <div className="input-area flex flex-col w-full">
-      <div className="flex-grow bg-transparent p-4 min-h-[100px] relative">
+      <div className="flex-grow bg-transparent p-4 min-h-[80px] relative">
         {isProcessed ? (
-          <div className="text-base text-gray-800 min-h-[100px]">
+          <div className="text-base text-[var(--color-text)] min-h-[80px] leading-relaxed">
             {renderHighlightedText()}
           </div>
         ) : (
           <>
             <textarea
               ref={textareaRef}
-              className="w-full bg-transparent resize-none text-base text-gray-800 outline-none min-h-[100px]"
+              className="w-full bg-transparent resize-none text-base text-[var(--color-text)] outline-none min-h-[80px] max-h-[80px] placeholder-[var(--color-text-muted)] leading-relaxed"
               value={text}
               onChange={(e) => setText(e.target.value)}
               onFocus={() => setIsFocused(true)}
               onBlur={() => setIsFocused(false)}
-              rows={5}
+              rows={4}
               style={{ overflow: 'hidden' }}
             />
             {!isFocused && text === "" && (
-              <div className="absolute top-4 left-4 text-gray-500 pointer-events-none">
+              <div className="absolute top-4 left-4 text-[var(--color-text-muted)] pointer-events-none">
                 Escriba su consulta...
               </div>
             )}
           </>
         )}
       </div>
-      <div className="flex justify-end p-1 px-2 items-center space-x-1">
+      <div className="flex justify-end p-1 px-2 items-center space-x-2">
         {/* RESET button*/}
         {isProcessed && (
           <button
@@ -226,12 +227,10 @@ export default function MessageInput({ initialQuery = "" }: MessageInputProps) {
               setText("");
               setHighlightedFragments([]);
             }}
-            className="btn-primary text-sm py-1 px-2.5"
+            className="btn-secondary text-sm py-2 px-3"
           >
+            <RefreshCw className="icon-sm" />
             RESET
-            <span className="material-icons ml-1 text-sm">
-              refresh
-            </span>
           </button>
         )}
         
@@ -240,7 +239,7 @@ export default function MessageInput({ initialQuery = "" }: MessageInputProps) {
           <button
             onClick={handleSend}
             disabled={(text.trim() === "" && !isProcessed) || (isProcessed && !allFragmentsConfirmed)}
-            className={`btn-secondary text-sm py-1 px-2.5 ${(text.trim() === "" && !isProcessed) || (isProcessed && !allFragmentsConfirmed) ? "opacity-50 cursor-not-allowed" : ""}`}
+            className={`btn-primary text-sm py-2 px-3 ${(text.trim() === "" && !isProcessed) || (isProcessed && !allFragmentsConfirmed) ? "opacity-50 cursor-not-allowed" : ""}`}
             onMouseEnter={() => {
               if (isProcessed && !allFragmentsConfirmed) {
                 setShowTooltip(true);
@@ -250,15 +249,13 @@ export default function MessageInput({ initialQuery = "" }: MessageInputProps) {
               setShowTooltip(false);
             }}
           >
+            <Send className="icon-sm" />
             SEND
-            <span className="material-icons ml-1 text-sm">
-              send
-            </span>
           </button>
           {showTooltip && isProcessed && !allFragmentsConfirmed && (
-            <div className="absolute bottom-full right-0 mb-2 px-3 py-1.5 bg-gray-800 text-white text-xs rounded-md shadow-lg whitespace-nowrap z-10">
+            <div className="absolute bottom-full right-0 mb-2 px-3 py-2 bg-text text-white text-xs rounded-lg shadow-lg whitespace-nowrap z-10">
               Confirme todos los términos resaltados
-              <div className="absolute top-full left-3/4 transform -translate-x-1/2 border-4 border-transparent border-t-gray-800"></div>
+              <div className="absolute top-full left-3/4 transform -translate-x-1/2 border-4 border-transparent border-t-text"></div>
             </div>
           )}
         </div>

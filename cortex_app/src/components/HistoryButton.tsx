@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import QueryHistory from "./QueryHistory";
-import {Clock } from "lucide-react";
+import { Clock } from "lucide-react";
 
 interface HistoryButtonProps {
   onSelectQuery: (query: string) => void;
@@ -23,11 +23,11 @@ export default function HistoryButton({ onSelectQuery }: HistoryButtonProps) {
   return (
     <>
       <button 
-        className="flex items-center text-gray-700 hover:text-[#146a8c] transition-colors p-0.5 rounded-full hover:bg-white/50"
+        className="btn-ghost p-2 rounded-full"
         onClick={handleOpenHistory}
         title={isAuthenticated ? "Ver historial" : "Inicia sesión para ver historial"}
       >
-      <Clock className="w-7 h-7" />
+        <Clock className="icon-lg text-text-light hover:text-primary transition-colors" />
       </button>
 
       <QueryHistory 

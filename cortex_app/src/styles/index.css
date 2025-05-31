@@ -1,71 +1,202 @@
 @import "tailwindcss";
-/* Variables personalizadas */
+
+/* Paleta de colores vibrante y profesional */
 :root {
-  --color-primary: #146a8c;
-  --color-secondary: #a8d0d0;
-  --color-accent: #5e35b1;
-  --color-background: #eaf3f3;
-  --color-text: #333333;
+  /* Colores principales más vibrantes */
+  --color-primary: #4a9d7a;        /* Verde más vibrante */
+  --color-primary-light: #6db89a;  /* Verde claro */
+  --color-primary-dark: #2d7a5a;   /* Verde oscuro */
+  
+  --color-secondary: #8fadca;      /* Azul vibrante */
+  --color-secondary-light: #b5c9df; /* Azul claro */
+  --color-secondary-dark: #6b8db0;  /* Azul oscuro */
+  
+  --color-accent: #a584c7;         /* Púrpura vibrante */
+  --color-accent-light: #c4a9d9;   /* Púrpura claro */
+  --color-accent-dark: #8b6fb5;    /* Púrpura oscuro */
+  
+  /* Fondos con más color */
+  --color-background: #f0f9f6;     /* Verde muy suave */
+  --color-background-soft: #e8f5f0; /* Verde más suave */
+  --color-background-accent: #f5f0ff; /* Púrpura muy suave */
+  
+  /* Textos */
+  --color-text: #1a2e23;          /* Verde muy oscuro */
+  --color-text-light: #4a6b56;    /* Verde medio */
+  --color-text-muted: #7a9485;    /* Verde claro */
+  
+  /* Colores de estado vibrantes */
+  --color-success: #16a34a;
+  --color-warning: #ea580c;
+  --color-error: #dc2626;
+  --color-info: #0284c7;
 }
 
-/* Clases personalizadas */
+/* Clases personalizadas con más personalidad */
 @layer components {
   .btn-primary {
-    @apply bg-[#2c87a8] hover:bg-[#146a8c] text-white font-medium py-2 px-4 rounded-md transition-colors duration-300 flex items-center gap-1 shadow-md;
+    @apply bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 flex items-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-[1.02];
   }
   
   .btn-secondary {
-    @apply bg-[#67a8a8] hover:bg-[#5a9494] text-white font-medium py-2 px-4 rounded-md transition-colors duration-300 flex items-center gap-1 shadow-md;
+    @apply bg-[var(--color-secondary)] hover:bg-[var(--color-secondary-dark)] text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 flex items-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-[1.02];
   }
   
+  .btn-accent {
+    @apply bg-[var(--color-accent)] hover:bg-[var(--color-accent-dark)] text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 flex items-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-[1.02];
+  }
+  
+  .btn-ghost {
+    @apply bg-white/80 backdrop-blur-sm hover:bg-white text-[var(--color-text)] font-medium py-2 px-4 rounded-xl transition-all duration-300 flex items-center gap-2 hover:shadow-lg border border-[var(--color-primary)]/20;
+  }
+  
+  /* Tamaños de iconos estandarizados */
+  .icon-sm { @apply w-4 h-4; }
+  .icon-md { @apply w-5 h-5; }
+  .icon-lg { @apply w-6 h-6; }
+  .icon-xl { @apply w-8 h-8; }
+  
   .card {
-    @apply bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-300;
+    @apply bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 border border-white/60;
   }
   
   .input-area {
-    @apply bg-[#a8d0d0] rounded-lg p-2 shadow-inner hover:shadow-md transition-shadow duration-300;
+    @apply bg-[var(--color-secondary-light)]/30 backdrop-blur-sm rounded-2xl p-4 shadow-lg hover:shadow-xl transition-all duration-300 border border-[var(--color-primary)]/20;
   }
   
   .logo-container {
-    @apply flex flex-col items-center mb-8 transition-transform duration-300 hover:scale-105;
+    @apply flex flex-col items-center mb-4 transition-transform duration-300 hover:scale-105;
   }
   
   .examples-card {
-    @apply bg-[#f0f0fa] rounded-lg p-6 shadow-md hover:shadow-lg transition-shadow duration-300 border-l-4 border-[#5e35b1];
+    @apply bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border-l-4 border-[var(--color-accent)] border border-[var(--color-primary)]/10;
+  }
+  
+  /* Estilos para modal con más color */
+  .modal-overlay {
+    @apply fixed inset-0 bg-gradient-to-br from-[var(--color-primary)]/20 to-[var(--color-accent)]/20 backdrop-blur-md flex justify-center items-center z-[100] transition-opacity duration-300;
+  }
+  
+  .modal-content {
+    @apply bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl border border-white/80 overflow-hidden transform transition-all duration-300;
+  }
+  
+  .modal-header {
+    @apply bg-[var(--color-primary)] text-white p-6 flex justify-between items-center;
+  }
+  
+  .table-header {
+    @apply bg-gradient-to-r from-[var(--color-secondary-light)]/40 to-[var(--color-primary-light)]/40 text-[var(--color-text)] backdrop-blur-sm;
+  }
+  
+  .table-row {
+    @apply border-b border-[var(--color-secondary-light)]/30 hover:bg-gradient-to-r hover:from-[var(--color-background)] hover:to-[var(--color-background-soft)] transition-all duration-200;
+  }
+  
+  .badge {
+    @apply px-3 py-1 rounded-full text-xs font-semibold shadow-sm;
+  }
+  
+  .badge-primary {
+    @apply bg-gradient-to-r from-[var(--color-primary)]/20 to-[var(--color-primary-light)]/20 text-[var(--color-primary-dark)] border border-[var(--color-primary)]/30;
+  }
+  
+  .badge-secondary {
+    @apply bg-gradient-to-r from-[var(--color-secondary)]/20 to-[var(--color-secondary-light)]/20 text-[var(--color-secondary-dark)] border border-[var(--color-secondary)]/30;
+  }
+  
+  .badge-accent {
+    @apply bg-gradient-to-r from-[var(--color-accent)]/20 to-[var(--color-accent-light)]/20 text-[var(--color-accent-dark)] border border-[var(--color-accent)]/30;
+  }
+
+  /* Efectos especiales para dar más vida */
+  .glass-effect {
+    @apply bg-white/30 backdrop-blur-md border border-white/40 shadow-lg;
+  }
+
+  .vibrant-gradient {
+    @apply bg-gradient-to-br from-[var(--color-primary)]/80 via-[var(--color-secondary)]/60 to-[var(--color-accent)]/80;
+  }
+
+  .soft-gradient {
+    @apply bg-gradient-to-br from-[var(--color-background)] via-white to-[var(--color-background-soft)];
   }
 }
 
-/* ...existing code... */
-
+/* Animaciones mejoradas con más vida */
 @keyframes typing {
-    from { width: 0 }
-    to { width: 100% }
-  }
-  
-  .typewriter p {
-    overflow: hidden;
-    white-space: nowrap;
-    animation: typing 1.5s steps(40);
-    border-right: 2px solid var(--color-primary);
-    padding: 4px 8px;
-    background-color: rgba(255, 255, 255, 0.9);
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    width: 0;
-    animation-fill-mode: forwards;
-  }
+  from { width: 0 }
+  to { width: 100% }
+}
 
-  @keyframes fadeInDown {
-    from {
-      opacity: 0;
-      transform: translateY(-20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px) scale(0.95);
   }
-  
-  .animate-fade-in-down {
-    animation: fadeInDown 0.3s ease-out forwards;
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse-gentle {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.02);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+.typewriter p {
+  overflow: hidden;
+  white-space: nowrap;
+  animation: typing 1.5s steps(40);
+  border-right: 2px solid var(--color-primary);
+  padding: 8px 12px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  width: 0;
+  animation-fill-mode: forwards;
+}
+
+.animate-fade-in-down {
+  animation: fadeInDown 0.4s ease-out forwards;
+}
+
+.animate-slide-in-left {
+  animation: slideInLeft 0.4s ease-out forwards;
+}
+
+.animate-pulse-gentle {
+  animation: pulse-gentle 3s ease-in-out infinite;
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}

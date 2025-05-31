@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { X, Loader2, AlertCircle, CheckCircle2 } from "lucide-react";
 import config from "../config";
 import ModalPortal from "./ModalPortal";
 
@@ -14,10 +15,22 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginMod
   const [isRegistering, setIsRegistering] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [success, setSuccess] = useState("");
+
+  // Limpiar campos cuando se abre/cierra el modal o cambia el modo
+  useEffect(() => {
+    if (isOpen) {
+      setEmail("");
+      setPassword("");
+      setError("");
+      setSuccess("");
+    }
+  }, [isOpen, isRegistering]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setSuccess("");
     setIsLoading(true);
 
     try {
@@ -34,8 +47,12 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginMod
           throw new Error(errorData.detail || "Error al registrarse");
         }
 
-        // Auto login after registration
+        // Mostrar mensaje de éxito y cambiar a login
+        setSuccess("¡Registro exitoso! Ahora puedes iniciar sesión");
         setIsRegistering(false);
+        setPassword(""); // Limpiar contraseña pero mantener email
+        setIsLoading(false);
+        return;
       }
 
       // Login - using OAuth2 password flow format
@@ -57,7 +74,17 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginMod
       }
 
       const data = await loginResponse.json();
-      onLoginSuccess(data.access_token);
+      setSuccess("¡Login exitoso!");
+      
+      // Pequeña pausa para mostrar el éxito antes de cerrar
+      setTimeout(() => {
+        onLoginSuccess(data.access_token);
+        setEmail("");
+        setPassword("");
+        setError("");
+        setSuccess("");
+      }, 500);
+      
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error en la autenticación");
     } finally {
@@ -65,64 +92,83 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginMod
     }
   };
 
+  const toggleMode = () => {
+    setIsRegistering(!isRegistering);
+    setError("");
+    setSuccess("");
+    setPassword(""); // Limpiar contraseña al cambiar modo
+  };
+
   if (!isOpen) return null;
 
   return (
     <ModalPortal>
       <div
-        className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-50"
+        className="modal-overlay"
         onClick={(e) => e.target === e.currentTarget && onClose()}
         style={{ top: 0, left: 0, right: 0, bottom: 0 }}
       >
-        <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-0 overflow-hidden m-4 animate-fade-in-down">
+        <div className="modal-content w-full max-w-md m-4 animate-fade-in-down">
           {/* Header */}
-          <div className="bg-gradient-to-r from-[#146a8c] to-[#2c87a8] text-white p-5 flex justify-between items-center">
+          <div className="modal-header">
             <h2 className="text-xl font-semibold">
               {isRegistering ? "Registro de usuario" : "Iniciar sesión"}
             </h2>
             <button 
               onClick={onClose}
-              className="text-white/80 hover:text-white transition-colors p-1 hover:bg-white/10 rounded-full"
+              className="text-white/90 hover:text-white hover:bg-white/20 p-2 rounded-lg transition-all duration-200 hover:rotate-90"
             >
-              <span className="material-icons">close</span>
+              <X className="icon-md" />
             </button>
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          <form onSubmit={handleSubmit} className="p-6 space-y-5">
+          
+          {/* Mensajes de estado */}
           {error && (
-            <div className="bg-red-100 border border-red-300 text-red-700 px-4 py-3 rounded">
-              {error}
+            <div className="bg-[var(--color-error)]/10 border border-[var(--color-error)]/30 text-[var(--color-error)] px-4 py-3 rounded-xl flex items-center gap-3">
+              <AlertCircle className="icon-md flex-shrink-0" />
+              <span className="font-medium">{error}</span>
+            </div>
+          )}
+
+          {success && (
+            <div className="bg-[var(--color-success)]/10 border border-[var(--color-success)]/30 text-[var(--color-success)] px-4 py-3 rounded-xl flex items-center gap-3">
+              <CheckCircle2 className="icon-md flex-shrink-0" />
+              <span className="font-medium">{success}</span>
             </div>
           )}
 
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">Email</label>
+            <label className="block text-sm font-semibold text-[var(--color-text)]">Email</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#146a8c]"
+              className="w-full px-4 py-3 border border-[var(--color-secondary)]/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] transition-all duration-200 bg-[var(--color-background)] text-[var(--color-text)] placeholder-[var(--color-text-muted)]"
               required
+              placeholder="tu@email.com"
             />
           </div>
 
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">Contraseña</label>
+            <label className="block text-sm font-semibold text-[var(--color-text)]">Contraseña</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#146a8c]"
+              className="w-full px-4 py-3 border border-[var(--color-secondary)]/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] transition-all duration-200 bg-[var(--color-background)] text-[var(--color-text)] placeholder-[var(--color-text-muted)]"
               required
+              placeholder="••••••••"
             />
           </div>
 
           <div className="flex justify-between items-center pt-4">
             <button
               type="button"
-              onClick={() => setIsRegistering(!isRegistering)}
-              className="text-[#146a8c] hover:underline text-sm"
+              onClick={toggleMode}
+              className="text-[var(--color-primary)] hover:text-[var(--color-primary-dark)] hover:underline transition-all duration-200 text-sm font-medium px-2 py-1 rounded-lg hover:bg-[var(--color-primary)]/5"
             >
               {isRegistering ? "¿Ya tienes cuenta? Inicia sesión" : "¿No tienes cuenta? Regístrate"}
             </button>
@@ -130,11 +176,11 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginMod
             <button
               type="submit"
               disabled={isLoading}
-              className="btn-primary"
+              className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed min-w-[140px]"
             >
               {isLoading ? (
-                <span className="flex items-center">
-                  <span className="animate-spin h-4 w-4 mr-2 border-2 border-white border-t-transparent rounded-full"></span>
+                <span className="flex items-center gap-2">
+                  <Loader2 className="icon-sm animate-spin" />
                   Cargando...
                 </span>
               ) : isRegistering ? (
