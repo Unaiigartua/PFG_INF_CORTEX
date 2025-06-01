@@ -1,9 +1,9 @@
 @import "tailwindcss";
 
-/* Paleta de colores vibrante y profesional */
+/* Variables CSS para modo claro y oscuro */
 :root {
-  /* Colores principales más vibrantes */
-  --color-primary: #4a9d7a;        /* Verde más vibrante */
+  /* MODO CLARO - Colores actuales conservados */
+  --color-primary: #4a9d7a;        /* Verde vibrante */
   --color-primary-light: #6db89a;  /* Verde claro */
   --color-primary-dark: #2d7a5a;   /* Verde oscuro */
   
@@ -15,24 +15,62 @@
   --color-accent-light: #c4a9d9;   /* Púrpura claro */
   --color-accent-dark: #8b6fb5;    /* Púrpura oscuro */
   
-  /* Fondos con más color */
+  /* Fondos modo claro */
   --color-background: #f0f9f6;     /* Verde muy suave */
   --color-background-soft: #e8f5f0; /* Verde más suave */
   --color-background-accent: #f5f0ff; /* Púrpura muy suave */
+  --color-background-card: rgba(255, 255, 255, 0.8); /* Fondo de tarjetas */
+  --color-background-nav: rgba(255, 255, 255, 0.8);  /* Fondo de navegación */
+  --color-background-footer: rgba(255, 255, 255, 0.7); /* Fondo de footer */
   
-  /* Textos */
+  /* Textos modo claro */
   --color-text: #1a2e23;          /* Verde muy oscuro */
   --color-text-light: #4a6b56;    /* Verde medio */
   --color-text-muted: #7a9485;    /* Verde claro */
   
-  /* Colores de estado vibrantes */
+  /* Colores de estado (igual en ambos modos) */
   --color-success: #16a34a;
   --color-warning: #ea580c;
   --color-error: #dc2626;
   --color-info: #0284c7;
 }
 
-/* Clases personalizadas con más personalidad */
+/* MODO OSCURO */
+[data-theme="dark"] {
+  /* Colores principales adaptados para modo oscuro */
+  --color-primary: #6ea085;        /* Verde más suave pero visible */
+  --color-primary-light: #8bb399;  /* Verde claro ajustado */
+  --color-primary-dark: #5a8a71;   /* Verde oscuro ajustado */
+  
+  --color-secondary: #acb1c8;      /* Azul grisáceo de tu paleta */
+  --color-secondary-light: #c1c5d6; /* Azul claro ajustado */
+  --color-secondary-dark: #969bb5;  /* Azul oscuro ajustado */
+  
+  --color-accent: #9f90b6;         /* Púrpura suave de tu paleta */
+  --color-accent-light: #b5a8c9;   /* Púrpura claro ajustado */
+  --color-accent-dark: #8a79a3;    /* Púrpura oscuro ajustado */
+  
+  /* Fondos modo oscuro */
+  --color-background: #0a0f0b;     /* Casi negro verdoso de tu paleta */
+  --color-background-soft: #1a1f1b; /* Un poco más claro para mejor contraste */
+  --color-background-accent: #1e1d22; /* Fondo con tinte púrpura más visible */
+  --color-background-card: rgba(26, 31, 27, 0.9); /* Fondo de tarjetas más visible */
+  --color-background-nav: rgba(26, 31, 27, 0.9);  /* Fondo de navegación más visible */
+  --color-background-footer: rgba(26, 31, 27, 0.8); /* Fondo de footer más visible */
+  
+  /* Textos modo oscuro */
+  --color-text: #fcfdfd;          /* Casi blanco de tu paleta */
+  --color-text-light: #d0d5d2;    /* Texto secundario */
+  --color-text-muted: #a0a8a3;    /* Texto tenue */
+  
+  /* Colores de estado ajustados para modo oscuro */
+  --color-success: #22c55e;       /* Más brillante para mejor contraste */
+  --color-warning: #f97316;       /* Más brillante */
+  --color-error: #ef4444;         /* Más brillante */
+  --color-info: #0ea5e9;          /* Más brillante */
+}
+
+/* Clases personalizadas actualizadas */
 @layer components {
   .btn-primary {
     @apply bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 flex items-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-[1.02];
@@ -47,7 +85,11 @@
   }
   
   .btn-ghost {
-    @apply bg-white/80 backdrop-blur-sm hover:bg-white text-[var(--color-text)] font-medium py-2 px-4 rounded-xl transition-all duration-300 flex items-center gap-2 hover:shadow-lg border border-[var(--color-primary)]/20;
+    @apply backdrop-blur-sm text-[var(--color-text)] font-medium py-2 px-4 rounded-xl transition-all duration-300 flex items-center gap-2 hover:shadow-lg border border-[var(--color-primary)]/20;
+    background-color: var(--color-background-card);
+  }
+  .btn-ghost:hover {
+    background-color: var(--color-background-soft);
   }
   
   /* Tamaños de iconos estandarizados */
@@ -57,11 +99,14 @@
   .icon-xl { @apply w-8 h-8; }
   
   .card {
-    @apply bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 border border-white/60;
+    @apply backdrop-blur-sm rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all duration-300;
+    background-color: var(--color-background-card);
+    border: 1px solid rgba(255, 255, 255, 0.1);
   }
   
   .input-area {
-    @apply bg-[var(--color-secondary-light)]/30 backdrop-blur-sm rounded-2xl p-4 shadow-lg hover:shadow-xl transition-all duration-300 border border-[var(--color-primary)]/20;
+    @apply backdrop-blur-sm rounded-2xl p-4 shadow-lg hover:shadow-xl transition-all duration-300 border border-[var(--color-primary)]/20;
+    background-color: rgba(143, 173, 202, 0.25); /* Tono azulado más suave para modo claro */
   }
   
   .logo-container {
@@ -69,16 +114,22 @@
   }
   
   .examples-card {
-    @apply bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border-l-4 border-[var(--color-accent)] border border-[var(--color-primary)]/10;
+    @apply backdrop-blur-sm rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border-l-4 border-[var(--color-accent)];
+    background-color: var(--color-background-card);
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   }
   
-  /* Estilos para modal con más color */
+  /* Estilos para modal actualizados */
   .modal-overlay {
     @apply fixed inset-0 bg-gradient-to-br from-[var(--color-primary)]/20 to-[var(--color-accent)]/20 backdrop-blur-md flex justify-center items-center z-[100] transition-opacity duration-300;
   }
   
   .modal-content {
-    @apply bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl border border-white/80 overflow-hidden transform transition-all duration-300;
+    @apply backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden transform transition-all duration-300;
+    background-color: var(--color-background-card);
+    border: 1px solid rgba(255, 255, 255, 0.2);
   }
   
   .modal-header {
@@ -86,11 +137,19 @@
   }
   
   .table-header {
-    @apply bg-gradient-to-r from-[var(--color-secondary-light)]/40 to-[var(--color-primary-light)]/40 text-[var(--color-text)] backdrop-blur-sm;
+    @apply backdrop-blur-sm text-[var(--color-text)] font-semibold;
+    background: linear-gradient(135deg, var(--color-secondary-light), var(--color-primary-light));
+    background-color: rgba(143, 173, 202, 0.4);
   }
   
   .table-row {
-    @apply border-b border-[var(--color-secondary-light)]/30 hover:bg-gradient-to-r hover:from-[var(--color-background)] hover:to-[var(--color-background-soft)] transition-all duration-200;
+    @apply transition-all duration-200;
+    border-bottom: 1px solid rgba(143, 173, 202, 0.2);
+    background-color: var(--color-background-card);
+  }
+  
+  .table-row:hover {
+    background: linear-gradient(90deg, var(--color-background-soft), var(--color-background-accent));
   }
   
   .badge {
@@ -109,9 +168,24 @@
     @apply bg-gradient-to-r from-[var(--color-accent)]/20 to-[var(--color-accent-light)]/20 text-[var(--color-accent-dark)] border border-[var(--color-accent)]/30;
   }
 
-  /* Efectos especiales para dar más vida */
+  /* Botones especiales para modales */
+  .btn-cancel {
+    @apply px-6 py-2 font-medium rounded-xl transition-all duration-200 border;
+    background-color: rgba(200, 200, 200, 0.8);
+    color: var(--color-text);
+    border-color: rgba(150, 150, 150, 0.5);
+  }
+  
+  .btn-cancel:hover {
+    background-color: rgba(180, 180, 180, 0.9);
+    border-color: rgba(130, 130, 130, 0.7);
+  }
+
+  /* Efectos especiales actualizados */
   .glass-effect {
-    @apply bg-white/30 backdrop-blur-md border border-white/40 shadow-lg;
+    @apply backdrop-blur-md shadow-lg;
+    background-color: var(--color-background-card);
+    border: 1px solid rgba(255, 255, 255, 0.2);
   }
 
   .vibrant-gradient {
@@ -119,11 +193,11 @@
   }
 
   .soft-gradient {
-    @apply bg-gradient-to-br from-[var(--color-background)] via-white to-[var(--color-background-soft)];
+    @apply bg-gradient-to-br from-[var(--color-background)] via-[var(--color-background-soft)] to-[var(--color-background-accent)];
   }
 }
 
-/* Animaciones mejoradas con más vida */
+/* Animaciones existentes conservadas */
 @keyframes typing {
   from { width: 0 }
   to { width: 100% }
@@ -183,6 +257,89 @@
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
   width: 0;
   animation-fill-mode: forwards;
+}
+
+/* Modo oscuro para input-area */
+[data-theme="dark"] .input-area {
+  background-color: rgba(42, 47, 43, 0.8); /* Fondo más claro y visible */
+  border-color: rgba(110, 160, 133, 0.3); /* Borde más visible */
+}
+
+/* Modo oscuro para cards y examples */
+[data-theme="dark"] .card,
+[data-theme="dark"] .examples-card {
+  background-color: rgba(42, 47, 43, 0.6);
+  border-color: rgba(110, 160, 133, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .examples-card {
+  border-left-color: var(--color-accent);
+}
+
+/* Modo oscuro para modals y tablas */
+[data-theme="dark"] .modal-content {
+  background-color: rgba(42, 47, 43, 0.95);
+  border-color: rgba(110, 160, 133, 0.3);
+}
+
+[data-theme="dark"] .table-header {
+  background: linear-gradient(135deg, rgba(110, 160, 133, 0.8), rgba(159, 144, 182, 0.8));
+  color: var(--color-text);
+  border-bottom: 2px solid rgba(110, 160, 133, 0.6);
+}
+
+[data-theme="dark"] .table-row {
+  background-color: rgba(60, 70, 65, 0.9);
+  border-bottom-color: rgba(110, 160, 133, 0.3);
+  color: var(--color-text-light);
+}
+
+[data-theme="dark"] .table-row:hover {
+  background: linear-gradient(90deg, rgba(80, 90, 85, 0.95), rgba(75, 85, 80, 0.95));
+}
+
+[data-theme="dark"] .table-row:nth-child(even) {
+  background-color: rgba(70, 80, 75, 0.8);
+}
+
+/* Mejorar la visibilidad del texto en modo oscuro */
+[data-theme="dark"] .table-row td {
+  color: var(--color-text-light);
+}
+
+[data-theme="dark"] .table-row:hover td {
+  color: var(--color-text);
+}
+
+/* Botón cancelar en modo oscuro */
+[data-theme="dark"] .btn-cancel {
+  background-color: rgba(80, 90, 85, 0.9);
+  color: var(--color-text-light);
+  border-color: rgba(110, 160, 133, 0.4);
+}
+
+[data-theme="dark"] .btn-cancel:hover {
+  background-color: rgba(100, 110, 105, 0.95);
+  color: var(--color-text);
+  border-color: rgba(110, 160, 133, 0.6);
+}
+
+/* Área de botones del modal en modo oscuro */
+[data-theme="dark"] .modal-content .border-t {
+  border-color: rgba(110, 160, 133, 0.3) !important;
+  background: linear-gradient(90deg, rgba(42, 47, 43, 0.8), rgba(38, 43, 39, 0.8)) !important;
+}
+
+[data-theme="dark"] .examples-card {
+  border-left-color: var(--color-accent);
+}
+
+/* Modo oscuro para el typewriter */
+[data-theme="dark"] .typewriter p {
+  background: linear-gradient(135deg, rgba(42, 47, 43, 0.9), rgba(42, 47, 43, 0.7));
+  color: var(--color-text);
+  border-right-color: var(--color-primary);
 }
 
 .animate-fade-in-down {

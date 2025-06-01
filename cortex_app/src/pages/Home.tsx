@@ -5,6 +5,7 @@ import MessageInput from "../components/MessageInput.tsx";
 import ExamplesList from "../components/ExamplesList.tsx";
 import FooterDisclaimer from "../components/FooterDisclaimer.tsx";
 import HistoryButton from "../components/HistoryButton.tsx";
+import ThemeToggle from "../components/ThemeToggle.tsx";
 
 interface HomeProps {
   onLoginClick: () => void;
@@ -20,10 +21,11 @@ export default function Home({ onLoginClick }: HomeProps) {
       <div className="absolute bottom-0 left-0 w-80 h-80 bg-[var(--color-secondary)]/5 rounded-full blur-3xl"></div>
       
       {/* Barra de navegación limpia y profesional */}
-      <div className="w-full flex justify-between items-center p-4 bg-white/80 backdrop-blur-sm sticky top-0 z-50 shadow-lg border-b border-[var(--color-primary)]/10">
+      <div className="w-full flex justify-between items-center p-4 backdrop-blur-sm sticky top-0 z-50 shadow-lg border-b border-[var(--color-primary)]/10" style={{ backgroundColor: 'var(--color-background-nav)' }}>
         {/* Contenedor izquierdo con margen */}
-        <div className="flex-1 flex justify-start pl-4 md:pl-8">
+        <div className="flex-1 flex justify-start items-center gap-3 pl-4 md:pl-8">
           <HistoryButton onSelectQuery={setCurrentQuery} />
+          <ThemeToggle />
         </div>
         
         {/* Contenedor derecho con margen */}
@@ -52,7 +54,7 @@ export default function Home({ onLoginClick }: HomeProps) {
       </div>
       
       {/* Footer profesional */}
-      <div className="w-full flex justify-center items-center p-4 bg-white/70 backdrop-blur-sm mt-auto border-t border-[var(--color-primary)]/10">
+      <div className="w-full flex justify-center items-center p-4 backdrop-blur-sm mt-auto border-t border-[var(--color-primary)]/10" style={{ backgroundColor: 'var(--color-background-footer)' }}>
         <FooterDisclaimer />
       </div>
     </div>

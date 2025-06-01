@@ -1,5 +1,6 @@
 import { useAuth } from "../context/AuthContext";
 import { User, LogOut, LogIn } from "lucide-react";
+import ThemeToggle from "./ThemeToggle";
 
 interface HeaderProps {
   onLoginClick: () => void;
