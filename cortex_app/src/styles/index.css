@@ -357,3 +357,228 @@
 .animate-float {
   animation: float 6s ease-in-out infinite;
 }
+
+
+/* Estilos específicos para TermValidationModal */
+
+/* === TABLA PRINCIPAL === */
+.term-validation-table {
+  @apply rounded-xl overflow-hidden shadow-lg;
+}
+
+/* Header de la tabla */
+.term-validation-header {
+  @apply backdrop-blur-sm font-semibold;
+  background: linear-gradient(135deg, var(--color-secondary-light), var(--color-primary-light));
+  background-color: rgba(143, 173, 202, 0.4);
+}
+
+/* Filas de la tabla - modo claro */
+.term-validation-row {
+  @apply transition-all duration-200;
+  border-bottom: 1px solid rgba(143, 173, 202, 0.2);
+  background-color: var(--color-background-card);
+}
+
+.term-validation-row:hover {
+  background: linear-gradient(90deg, var(--color-background-soft), var(--color-background-accent));
+}
+
+/* Filas seleccionadas - modo claro */
+.term-validation-row-selected {
+  @apply border-[var(--color-primary)]/30;
+  background: linear-gradient(90deg, var(--color-primary)/10, var(--color-primary)/5) !important;
+}
+
+/* === TEXTOS DE LA TABLA === */
+.term-validation-term {
+  @apply text-[var(--color-text)];
+}
+
+.term-validation-term:hover {
+  @apply text-[var(--color-primary)];
+}
+
+.term-validation-pt {
+  @apply text-[var(--color-text-light)];
+}
+
+.term-validation-pt:hover {
+  @apply text-[var(--color-text)];
+}
+
+.term-validation-code {
+  @apply text-[var(--color-accent)];
+}
+
+.term-validation-code:hover {
+  @apply text-[var(--color-accent-dark)];
+}
+
+/* === BADGES === */
+.term-validation-badge {
+  @apply px-3 py-1 rounded-full text-xs font-semibold shadow-sm;
+  @apply bg-gradient-to-r from-[var(--color-secondary)]/20 to-[var(--color-secondary-light)]/20;
+  @apply text-[var(--color-secondary-dark)] border border-[var(--color-secondary)]/30;
+}
+
+/* === CHECKBOX === */
+.term-validation-checkbox {
+  @apply border-[var(--color-secondary)] text-[var(--color-primary)] focus:ring-[var(--color-primary)];
+}
+
+/* === PAGINACIÓN === */
+.term-validation-pagination-info {
+  @apply font-medium px-4 py-2 rounded-lg border;
+  background-color: var(--color-background-soft);
+  color: var(--color-text-light);
+  border-color: rgba(143, 173, 202, 0.2);
+}
+
+.term-validation-nav-btn {
+  @apply px-3 py-2 font-medium rounded-xl transition-all duration-300 flex items-center gap-2;
+  background-color: var(--color-background-card);
+  color: var(--color-text);
+  border: 1px solid rgba(143, 173, 202, 0.2);
+}
+
+.term-validation-nav-btn:hover {
+  background-color: var(--color-background-soft);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* === FOOTER Y BOTONES === */
+.term-validation-footer {
+  @apply p-6 flex justify-end space-x-4 border-t;
+  border-color: var(--color-background-soft);
+  background: linear-gradient(to right, white, var(--color-background-soft));
+}
+
+.term-validation-cancel-btn {
+  @apply px-6 py-2 font-medium rounded-xl transition-all duration-200 border;
+  background-color: var(--color-background-soft);
+  color: var(--color-text);
+  border-color: var(--color-secondary)/30;
+}
+
+.term-validation-cancel-btn:hover {
+  background-color: var(--color-background);
+  border-color: var(--color-secondary)/50;
+  color: var(--color-text-light);
+}
+
+/* ========== MODO OSCURO ========== */
+[data-theme="dark"] .term-validation-header {
+  background: linear-gradient(135deg, rgba(110, 160, 133, 0.9), rgba(159, 144, 182, 0.8));
+  color: var(--color-text);
+  border-bottom: 2px solid rgba(110, 160, 133, 0.6);
+}
+
+[data-theme="dark"] .term-validation-row {
+  background-color: rgba(42, 47, 43, 0.8);
+  border-bottom-color: rgba(110, 160, 133, 0.25);
+  color: var(--color-text-light);
+}
+
+[data-theme="dark"] .term-validation-row:hover {
+  background: linear-gradient(90deg, rgba(60, 70, 65, 0.9), rgba(55, 65, 60, 0.9));
+}
+
+[data-theme="dark"] .term-validation-row:nth-child(even) {
+  background-color: rgba(50, 57, 52, 0.7);
+}
+
+[data-theme="dark"] .term-validation-row-selected {
+  background: linear-gradient(90deg, rgba(110, 160, 133, 0.25), rgba(110, 160, 133, 0.15)) !important;
+  border-color: rgba(110, 160, 133, 0.5);
+  box-shadow: 0 0 0 1px rgba(110, 160, 133, 0.3);
+}
+
+/* Textos en modo oscuro */
+[data-theme="dark"] .term-validation-term {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+[data-theme="dark"] .term-validation-term:hover {
+  color: var(--color-primary-light);
+}
+
+[data-theme="dark"] .term-validation-pt {
+  color: var(--color-text-light);
+}
+
+[data-theme="dark"] .term-validation-pt:hover {
+  color: var(--color-text);
+}
+
+[data-theme="dark"] .term-validation-code {
+  color: var(--color-accent-light);
+  font-weight: 600;
+}
+
+[data-theme="dark"] .term-validation-code:hover {
+  color: var(--color-accent);
+}
+
+/* Badges en modo oscuro */
+[data-theme="dark"] .term-validation-badge {
+  background: linear-gradient(135deg, rgba(172, 177, 200, 0.3), rgba(172, 177, 200, 0.2));
+  color: var(--color-secondary-light);
+  border-color: rgba(172, 177, 200, 0.5);
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Checkbox en modo oscuro */
+[data-theme="dark"] .term-validation-checkbox {
+  background-color: rgba(42, 47, 43, 0.8);
+  border-color: var(--color-secondary-light);
+  color: var(--color-primary-light);
+}
+
+[data-theme="dark"] .term-validation-checkbox:checked {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+/* Paginación en modo oscuro */
+[data-theme="dark"] .term-validation-pagination-info {
+  background-color: rgba(42, 47, 43, 0.9);
+  color: var(--color-text);
+  border-color: rgba(110, 160, 133, 0.4);
+  font-weight: 600;
+}
+
+[data-theme="dark"] .term-validation-nav-btn {
+  background-color: rgba(42, 47, 43, 0.8);
+  color: var(--color-text-light);
+  border-color: rgba(110, 160, 133, 0.3);
+}
+
+[data-theme="dark"] .term-validation-nav-btn:hover {
+  background-color: rgba(60, 70, 65, 0.9);
+  color: var(--color-text);
+  border-color: rgba(110, 160, 133, 0.5);
+}
+
+/* Footer en modo oscuro */
+[data-theme="dark"] .term-validation-footer {
+  border-color: rgba(110, 160, 133, 0.3);
+  background: linear-gradient(to right, rgba(42, 47, 43, 0.9), rgba(38, 43, 39, 0.9));
+}
+
+/* Botón cancelar en modo oscuro */
+[data-theme="dark"] .term-validation-cancel-btn {
+  background-color: rgba(60, 70, 65, 0.9);
+  color: var(--color-text);
+  border-color: rgba(110, 160, 133, 0.4);
+  font-weight: 600;
+}
+
+[data-theme="dark"] .term-validation-cancel-btn:hover {
+  background-color: rgba(80, 90, 85, 0.95);
+  color: var(--color-text);
+  border-color: rgba(110, 160, 133, 0.6);
+  box-shadow: 0 2px 8px rgba(110, 160, 133, 0.2);
+}

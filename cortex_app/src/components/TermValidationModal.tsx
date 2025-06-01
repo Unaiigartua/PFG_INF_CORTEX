@@ -107,74 +107,77 @@ export default function TermValidationModal({
             </div>
           ) : (
             <>
-              <div ref={tableRef} className="overflow-hidden rounded-xl border border-[var(--color-secondary)]/30 shadow-lg bg-white">
-                <table className="w-full table-auto border-collapse text-sm text-[var(--color-text)]">
-                  <thead className="table-header sticky top-0 z-10">
-                    <tr>
-                      <th className="p-4 w-12 font-semibold">✓</th>
-                      <th className="p-4 text-left font-semibold w-1/3">Term</th>
-                      <th className="p-4 text-left font-semibold w-1/3">PT</th>
-                      <th className="p-4 text-left font-semibold w-1/6">Tag</th>
-                      <th className="p-4 text-left font-semibold w-1/6">Code</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {paginatedTerms.map((t, i) => {
-                      const globalIndex = start + i;
-                      return (
-                        <tr
-                          key={globalIndex}
-                          className={`table-row cursor-pointer ${
-                            selected.has(globalIndex) ? "bg-[var(--color-primary)]/10 border-[var(--color-primary)]/20" : ""
-                          }`}
-                        >
-                          <td className="p-3 text-center">
-                            <div className="flex justify-center">
-                              <input
-                                type="checkbox"
-                                checked={selected.has(globalIndex)}
-                                onChange={() => toggleSelect(globalIndex)}
-                                className="h-4 w-4 rounded border-[var(--color-secondary)] text-[var(--color-primary)] focus:ring-[var(--color-primary)] cursor-pointer"
-                              />
-                            </div>
-                          </td>
-                          <td 
-                            className="p-3 font-medium text-[var(--color-text)] cursor-pointer hover:text-[var(--color-primary)] transition-colors"
-                            onClick={() => toggleSelect(globalIndex)}
+              <div ref={tableRef} className="overflow-hidden rounded-xl border border-[var(--color-secondary)]/30 shadow-lg">
+                {/* Tabla con estilos mejorados para modo oscuro */}
+                <div className="term-validation-table bg-white dark:bg-[var(--color-background-soft)]">
+                  <table className="w-full table-auto border-collapse text-sm">
+                    <thead className="term-validation-header sticky top-0 z-10">
+                      <tr>
+                        <th className="p-4 w-12 font-semibold text-[var(--color-text)]">✓</th>
+                        <th className="p-4 text-left font-semibold w-1/3 text-[var(--color-text)]">Term</th>
+                        <th className="p-4 text-left font-semibold w-1/3 text-[var(--color-text)]">PT</th>
+                        <th className="p-4 text-left font-semibold w-1/6 text-[var(--color-text)]">Tag</th>
+                        <th className="p-4 text-left font-semibold w-1/6 text-[var(--color-text)]">Code</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {paginatedTerms.map((t, i) => {
+                        const globalIndex = start + i;
+                        return (
+                          <tr
+                            key={globalIndex}
+                            className={`term-validation-row cursor-pointer ${
+                              selected.has(globalIndex) ? "term-validation-row-selected" : ""
+                            }`}
                           >
-                            {t.term}
-                          </td>
-                          <td 
-                            className="p-3 text-[var(--color-text-light)] cursor-pointer hover:text-[var(--color-text)] transition-colors"
-                            onClick={() => toggleSelect(globalIndex)}
-                          >
-                            {t.preferred_term}
-                          </td>
-                          <td 
-                            className="p-3 cursor-pointer"
-                            onClick={() => toggleSelect(globalIndex)}
-                          >
-                            <span className="badge badge-secondary">
-                              {t.semantic_tag}
-                            </span>
-                          </td>
-                          <td 
-                            className="p-3 font-mono text-[var(--color-accent)] font-medium cursor-pointer hover:text-[var(--color-accent-dark)] transition-colors"
-                            onClick={() => toggleSelect(globalIndex)}
-                          >
-                            {t.concept_id}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+                            <td className="p-3 text-center">
+                              <div className="flex justify-center">
+                                <input
+                                  type="checkbox"
+                                  checked={selected.has(globalIndex)}
+                                  onChange={() => toggleSelect(globalIndex)}
+                                  className="term-validation-checkbox h-4 w-4 rounded cursor-pointer"
+                                />
+                              </div>
+                            </td>
+                            <td 
+                              className="p-3 font-medium cursor-pointer transition-colors term-validation-term"
+                              onClick={() => toggleSelect(globalIndex)}
+                            >
+                              {t.term}
+                            </td>
+                            <td 
+                              className="p-3 cursor-pointer transition-colors term-validation-pt"
+                              onClick={() => toggleSelect(globalIndex)}
+                            >
+                              {t.preferred_term}
+                            </td>
+                            <td 
+                              className="p-3 cursor-pointer"
+                              onClick={() => toggleSelect(globalIndex)}
+                            >
+                              <span className="term-validation-badge">
+                                {t.semantic_tag}
+                              </span>
+                            </td>
+                            <td 
+                              className="p-3 font-mono font-medium cursor-pointer transition-colors term-validation-code"
+                              onClick={() => toggleSelect(globalIndex)}
+                            >
+                              {t.concept_id}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
               </div>
 
-              {/* PAGINATION */}
+              {/* PAGINATION con estilos mejorados */}
               {totalPages > 1 && (
-                <div className="flex justify-between items-center mt-6 text-sm text-text-light">
-                  <span className="bg-background-soft px-3 py-2 rounded-lg font-medium border border-secondary/20">
+                <div className="flex justify-between items-center mt-6 text-sm">
+                  <span className="term-validation-pagination-info">
                     {start + 1}–{Math.min(start + ITEMS_PER_PAGE, terms.length)} of{" "}
                     {terms.length}
                   </span>
@@ -182,7 +185,7 @@ export default function TermValidationModal({
                     <button
                       onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
                       disabled={currentPage === 1}
-                      className="btn-ghost px-3 py-2 disabled:opacity-40"
+                      className="term-validation-nav-btn disabled:opacity-40"
                     >
                       <ChevronLeft className="icon-sm mr-1" />
                       Anterior
@@ -190,7 +193,7 @@ export default function TermValidationModal({
                     <button
                       onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
                       disabled={currentPage === totalPages}
-                      className="btn-ghost px-3 py-2 disabled:opacity-40"
+                      className="term-validation-nav-btn disabled:opacity-40"
                     >
                       Siguiente
                       <ChevronRight className="icon-sm ml-1" />
@@ -202,11 +205,11 @@ export default function TermValidationModal({
           )}
         </div>
 
-        {/* BUTTONS */}
-        <div className="p-6 flex justify-end space-x-4 border-t border-[var(--color-background-soft)] bg-gradient-to-r from-white to-[var(--color-background-soft)]">
+        {/* BUTTONS con estilos mejorados */}
+        <div className="term-validation-footer">
           <button
             onClick={onClose}
-            className="px-6 py-2 bg-gray-100 hover:bg-gray-200 text-[var(--color-text)] font-medium rounded-xl transition-all duration-200 border border-gray-300"
+            className="term-validation-cancel-btn"
           >
             Cancelar
           </button>
