@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { X, Loader2, AlertCircle, CheckCircle2 } from "lucide-react";
+import { useI18n } from "../context/I18nContext";
 import config from "../config";
 import ModalPortal from "./ModalPortal";
 
@@ -16,6 +17,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginMod
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState("");
+  const { t } = useI18n();
 
   // Limpiar campos cuando se abre/cierra el modal o cambia el modo
   useEffect(() => {
@@ -44,11 +46,11 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginMod
 
         if (!registerResponse.ok) {
           const errorData = await registerResponse.json();
-          throw new Error(errorData.detail || "Error al registrarse");
+          throw new Error(errorData.detail || t('login.registration_error'));
         }
 
         // Mostrar mensaje de éxito y cambiar a login
-        setSuccess("¡Registro exitoso! Ahora puedes iniciar sesión");
+        setSuccess(t('login.register_success'));
         setIsRegistering(false);
         setPassword(""); // Limpiar contraseña pero mantener email
         setIsLoading(false);
@@ -70,11 +72,11 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginMod
 
       if (!loginResponse.ok) {
         const errorData = await loginResponse.json();
-        throw new Error(errorData.detail || "Credenciales inválidas");
+        throw new Error(errorData.detail || t('login.invalid_credentials'));
       }
 
       const data = await loginResponse.json();
-      setSuccess("¡Login exitoso!");
+      setSuccess(t('login.login_success'));
       
       // Pequeña pausa para mostrar el éxito antes de cerrar
       setTimeout(() => {
@@ -86,7 +88,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginMod
       }, 500);
       
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Error en la autenticación");
+      setError(err instanceof Error ? err.message : t('login.auth_error'));
     } finally {
       setIsLoading(false);
     }
@@ -112,7 +114,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginMod
           {/* Header */}
           <div className="modal-header">
             <h2 className="text-xl font-semibold">
-              {isRegistering ? "Registro de usuario" : "Iniciar sesión"}
+              {isRegistering ? t('login.register_title') : t('login.title')}
             </h2>
             <button 
               onClick={onClose}
@@ -141,26 +143,26 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginMod
           )}
 
           <div className="space-y-2">
-            <label className="block text-sm font-semibold text-[var(--color-text)]">Email</label>
+            <label className="block text-sm font-semibold text-[var(--color-text)]">{t('login.email')}</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-4 py-3 border border-[var(--color-secondary)]/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] transition-all duration-200 bg-[var(--color-background)] text-[var(--color-text)] placeholder-[var(--color-text-muted)]"
               required
-              placeholder="tu@email.com"
+              placeholder={t('login.email_placeholder')}
             />
           </div>
 
           <div className="space-y-2">
-            <label className="block text-sm font-semibold text-[var(--color-text)]">Contraseña</label>
+            <label className="block text-sm font-semibold text-[var(--color-text)]">{t('login.password')}</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full px-4 py-3 border border-[var(--color-secondary)]/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] transition-all duration-200 bg-[var(--color-background)] text-[var(--color-text)] placeholder-[var(--color-text-muted)]"
               required
-              placeholder="••••••••"
+              placeholder={t('login.password_placeholder')}
             />
           </div>
 
@@ -170,7 +172,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginMod
               onClick={toggleMode}
               className="text-[var(--color-primary)] hover:text-[var(--color-primary-dark)] hover:underline transition-all duration-200 text-sm font-medium px-2 py-1 rounded-lg hover:bg-[var(--color-primary)]/5"
             >
-              {isRegistering ? "¿Ya tienes cuenta? Inicia sesión" : "¿No tienes cuenta? Regístrate"}
+              {isRegistering ? t('login.toggle_login') : t('login.toggle_register')}
             </button>
 
             <button
@@ -181,12 +183,12 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginMod
               {isLoading ? (
                 <span className="flex items-center gap-2">
                   <Loader2 className="icon-sm animate-spin" />
-                  Cargando...
+                  {t('login.loading')}
                 </span>
               ) : isRegistering ? (
-                "Registrarse"
+                t('login.register')
               ) : (
-                "Iniciar sesión"
+                t('login.login')
               )}
             </button>
           </div>

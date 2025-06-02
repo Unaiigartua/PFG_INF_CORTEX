@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { X, ChevronLeft, ChevronRight, Check } from "lucide-react";
+import { useI18n } from "../context/I18nContext";
 import config from "../config";
 
 interface SimilarTerm {
@@ -30,6 +31,7 @@ export default function TermValidationModal({
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const tableRef = useRef<HTMLDivElement>(null);
+  const { t } = useI18n();
 
   useEffect(() => {
     if (isOpen && term) {
@@ -45,10 +47,10 @@ export default function TermValidationModal({
           setSelected(new Set());
           setCurrentPage(1);
         })
-        .catch((err) => console.error("Error fetching similar terms:", err))
+        .catch((err) => console.error(t('term_validation.error'), err))
         .finally(() => setIsLoading(false));
     }
-  }, [isOpen, term]);
+  }, [isOpen, term, t]);
 
   useEffect(() => {
     if (tableRef.current) {
@@ -89,7 +91,7 @@ export default function TermValidationModal({
         {/* Header */}
         <div className="modal-header">
           <h2 className="text-xl font-semibold">
-            Validate Term: <span className="italic font-normal">{term}</span>
+            {t('term_validation.title')}: <span className="italic font-normal">{term}</span>
           </h2>
           <button 
             onClick={onClose}
@@ -116,8 +118,8 @@ export default function TermValidationModal({
                         <th className="p-4 w-12 font-semibold text-[var(--color-text)]">✓</th>
                         <th className="p-4 text-left font-semibold w-1/3 text-[var(--color-text)]">Term</th>
                         <th className="p-4 text-left font-semibold w-1/3 text-[var(--color-text)]">PT</th>
-                        <th className="p-4 text-left font-semibold w-1/6 text-[var(--color-text)]">Tag</th>
-                        <th className="p-4 text-left font-semibold w-1/6 text-[var(--color-text)]">Code</th>
+                        <th className="p-4 text-left font-semibold w-5/24 text-[var(--color-text)]">Tag</th>
+                        <th className="p-4 text-left font-semibold w-3/24 text-[var(--color-text)]">Code</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -178,7 +180,7 @@ export default function TermValidationModal({
               {totalPages > 1 && (
                 <div className="flex justify-between items-center mt-6 text-sm">
                   <span className="term-validation-pagination-info">
-                    {start + 1}–{Math.min(start + ITEMS_PER_PAGE, terms.length)} of{" "}
+                    {start + 1}–{Math.min(start + ITEMS_PER_PAGE, terms.length)} {t('term_validation.of')}{" "}
                     {terms.length}
                   </span>
                   <div className="flex space-x-2">
@@ -188,14 +190,14 @@ export default function TermValidationModal({
                       className="term-validation-nav-btn disabled:opacity-40"
                     >
                       <ChevronLeft className="icon-sm mr-1" />
-                      Anterior
+                      {t('term_validation.previous')}
                     </button>
                     <button
                       onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
                       disabled={currentPage === totalPages}
                       className="term-validation-nav-btn disabled:opacity-40"
                     >
-                      Siguiente
+                      {t('term_validation.next')}
                       <ChevronRight className="icon-sm ml-1" />
                     </button>
                   </div>
@@ -211,14 +213,14 @@ export default function TermValidationModal({
             onClick={onClose}
             className="term-validation-cancel-btn"
           >
-            Cancelar
+            {t('term_validation.cancel')}
           </button>
           <button
             onClick={handleConfirm}
             disabled={selected.size === 0}
             className={`btn-primary ${selected.size === 0 ? 'opacity-60 cursor-not-allowed' : ''}`}
           >
-            Confirmar selección
+            {t('term_validation.confirm')}
             <Check className="icon-sm" />
           </button>
         </div>

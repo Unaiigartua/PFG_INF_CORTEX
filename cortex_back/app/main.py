@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 # Importa tus routers originales
 from app.ner import extract_medical_terms
+from app.nerEs import extract_medical_terms_es
 from app.similarity import get_similar_terms
 from app.similarity_bd import get_similar_terms_bd
 from app.models import (
@@ -50,6 +51,13 @@ def extract_entities(input: TextInput):
     entities_raw = extract_medical_terms(input.text)
     entities = [Entity(**e) for e in entities_raw]
     return TextEntities(entities=entities)
+
+@app.post("/extractEs", response_model=TextEntities)
+def extract_entities(input: TextInput):
+    entities_raw = extract_medical_terms_es(input.text)
+    entities = [Entity(**e) for e in entities_raw]
+    return TextEntities(entities=entities)
+
 
 @app.post("/similar", response_model=SimilarTermList)
 def similar_terms(input: SimilarTermInput):

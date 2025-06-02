@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { useTheme } from '../context/ThemeContext';
+import { useI18n } from '../context/I18nContext';
 
 export default function Logo() {
   const [showText, setShowText] = useState(false);
   const { theme } = useTheme();
+  const { t } = useI18n();
   
   return (
     <div 
@@ -26,7 +28,7 @@ export default function Logo() {
       {showText && (
         <div className="absolute -bottom-6 typewriter z-10">
           <p className="text-xs text-center font-medium text-[var(--color-primary)] bg-white/95 dark:bg-gray-800/95 px-3 py-2 rounded-lg border border-[var(--color-primary)]/20">
-            Clinical Oriented Request Translator for EXecutable SQL
+            {t('logo.description')}
           </p>
         </div>
       )}

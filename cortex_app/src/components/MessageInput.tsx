@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect } from "react";
 import { Send, RefreshCw, CheckCircle, Circle } from "lucide-react";
+import { useI18n } from "../context/I18nContext";
 import TermValidationModal from "./TermValidationModal";
 import config from "../config";
 import { useAuth } from "../context/AuthContext";
 
-async function extractEntities(text: string, token: string | null) {
+async function extractEntities(text: string, token: string | null, language: 'es' | 'en') {
   const headers: HeadersInit = { "Content-Type": "application/json" };
   
   // Add authorization header if token exists
@@ -12,7 +13,10 @@ async function extractEntities(text: string, token: string | null) {
     headers["Authorization"] = `Bearer ${token}`;
   }
 
-  const response = await fetch(`${config.API_BASE_URL}/extract`, {
+  // Seleccionar endpoint según el idioma
+  const endpoint = language === 'es' ? '/extractEs' : '/extract';
+
+  const response = await fetch(`${config.API_BASE_URL}${endpoint}`, {
     method: "POST",
     headers,
     body: JSON.stringify({ text }),
@@ -60,6 +64,7 @@ export default function MessageInput({ initialQuery = "" }: MessageInputProps) {
   
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { token, isAuthenticated } = useAuth();
+  const { t, language } = useI18n();
 
   // Handle initialQuery changes
   useEffect(() => {
@@ -81,7 +86,8 @@ export default function MessageInput({ initialQuery = "" }: MessageInputProps) {
     
     if (!isProcessed) {
       try {
-        const entities = await extractEntities(text, token);
+        // 👈 Pasamos el idioma actual a la función de extracción
+        const entities = await extractEntities(text, token, language);
   
         const fragments = entities.map((e: any) => ({
           text: e.word,
@@ -99,7 +105,7 @@ export default function MessageInput({ initialQuery = "" }: MessageInputProps) {
         console.error("Error al extraer entidades:", err);
       }
     } else if (allFragmentsConfirmed) {
-      console.log("Ejecutando consulta SQL...");
+      console.log(t('input.executing_query'));
     }
   };
 
@@ -212,7 +218,7 @@ export default function MessageInput({ initialQuery = "" }: MessageInputProps) {
             />
             {!isFocused && text === "" && (
               <div className="absolute top-4 left-4 text-[var(--color-text-muted)] pointer-events-none">
-                Escriba su consulta...
+                {t('input.placeholder')}
               </div>
             )}
           </>
@@ -230,7 +236,7 @@ export default function MessageInput({ initialQuery = "" }: MessageInputProps) {
             className="btn-secondary text-sm py-2 px-3"
           >
             <RefreshCw className="icon-sm" />
-            RESET
+            {t('input.reset')}
           </button>
         )}
         
@@ -250,11 +256,11 @@ export default function MessageInput({ initialQuery = "" }: MessageInputProps) {
             }}
           >
             <Send className="icon-sm" />
-            SEND
+            {t('input.send')}
           </button>
           {showTooltip && isProcessed && !allFragmentsConfirmed && (
             <div className="absolute bottom-full right-0 mb-2 px-3 py-2 bg-text text-white text-xs rounded-lg shadow-lg whitespace-nowrap z-10">
-              Confirme todos los términos resaltados
+              {t('input.confirm_terms')}
               <div className="absolute top-full left-3/4 transform -translate-x-1/2 border-4 border-transparent border-t-text"></div>
             </div>
           )}

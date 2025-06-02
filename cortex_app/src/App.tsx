@@ -2,6 +2,7 @@ import { useState } from "react";
 import Home from "./pages/Home";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { ThemeProvider } from "./context/ThemeContext";
+import { I18nProvider } from "./context/I18nContext";
 import LoginModal from "./components/LoginModal";
 
 function AppContent() {
@@ -28,9 +29,11 @@ function AppContent() {
 function App() {
   return (
     <ThemeProvider>
-      <AuthProvider>
-        <AppContent />
-      </AuthProvider>
+      <I18nProvider>
+        <AuthProvider>
+          <AppContent />
+        </AuthProvider>
+      </I18nProvider>
     </ThemeProvider>
   );
 }

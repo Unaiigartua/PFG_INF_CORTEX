@@ -1,14 +1,16 @@
 import { Sun, Moon } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
+import { useI18n } from "../context/I18nContext";
 
 export default function ThemeToggle() {
   const { theme, toggleTheme } = useTheme();
+  const { t } = useI18n();
 
   return (
     <button
       onClick={toggleTheme}
       className="btn-ghost p-2 rounded-full relative overflow-hidden group"
-      title={theme === 'light' ? 'Cambiar a modo oscuro' : 'Cambiar a modo claro'}
+      title={theme === 'light' ? t('theme.dark') : t('theme.light')}
     >
       {/* Contenedor con transición */}
       <div className="relative">

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import { useI18n } from "../context/I18nContext";
 import { api } from "../utils/api";
 
 interface QueryLogItem {
@@ -17,6 +18,7 @@ export default function QueryHistory({ isOpen, onClose, onSelect }: {
   const [queries, setQueries] = useState<QueryLogItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const { isAuthenticated } = useAuth();
+  const { t } = useI18n();
 
   useEffect(() => {
     if (isOpen && isAuthenticated) {
@@ -53,7 +55,7 @@ export default function QueryHistory({ isOpen, onClose, onSelect }: {
         }`}
       >
         <div className="modal-header">
-          <h2 className="text-xl font-semibold">Historial de consultas</h2>
+          <h2 className="text-xl font-semibold">{t('history.title')}</h2>
           <button
             onClick={onClose}
             className="text-white/90 hover:text-white hover:bg-white/20 p-2 rounded-lg transition-all duration-200 hover:rotate-90"
@@ -69,7 +71,7 @@ export default function QueryHistory({ isOpen, onClose, onSelect }: {
             </div>
           ) : queries.length === 0 ? (
             <div className="text-center py-8 text-text-muted">
-              No hay consultas en el historial
+              {t('history.no_queries')}
             </div>
           ) : (
             <ul className="space-y-3">
