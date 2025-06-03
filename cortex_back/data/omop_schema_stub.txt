@@ -1,0 +1,257 @@
+-- OMOP Common Data Model v5.3 Schema Summary
+-- Use this schema reference for generating SQL queries
+
+-- =============================================================================
+-- CORE CLINICAL TABLES
+-- =============================================================================
+
+-- PERSON: Demographics and basic patient information
+PERSON (
+    person_id INTEGER PRIMARY KEY,
+    gender_concept_id INTEGER,          -- 8507=Male, 8532=Female
+    year_of_birth INTEGER,
+    month_of_birth INTEGER,
+    day_of_birth INTEGER,
+    race_concept_id INTEGER,            -- 8527=White, 8516=Black, 8515=Asian
+    ethnicity_concept_id INTEGER,       -- 38003563=Not Hispanic, 38003564=Hispanic
+    location_id INTEGER,
+    provider_id INTEGER,
+    care_site_id INTEGER
+);
+
+-- CONDITION_OCCURRENCE: Patient diagnoses and medical conditions
+CONDITION_OCCURRENCE (
+    condition_occurrence_id INTEGER PRIMARY KEY,
+    person_id INTEGER,                  -- FK to PERSON
+    condition_concept_id INTEGER,       -- FK to CONCEPT (standard concept)
+    condition_start_date DATE,
+    condition_end_date DATE,
+    condition_type_concept_id INTEGER,  -- How condition was recorded
+    provider_id INTEGER,
+    visit_occurrence_id INTEGER
+);
+
+-- DRUG_EXPOSURE: Medications and drug treatments
+DRUG_EXPOSURE (
+    drug_exposure_id INTEGER PRIMARY KEY,
+    person_id INTEGER,                  -- FK to PERSON
+    drug_concept_id INTEGER,            -- FK to CONCEPT (standard concept)
+    drug_exposure_start_date DATE,
+    drug_exposure_end_date DATE,
+    drug_type_concept_id INTEGER,       -- How drug was recorded
+    quantity REAL,
+    days_supply INTEGER,
+    provider_id INTEGER,
+    visit_occurrence_id INTEGER
+);
+
+-- PROCEDURE_OCCURRENCE: Medical procedures and interventions
+PROCEDURE_OCCURRENCE (
+    procedure_occurrence_id INTEGER PRIMARY KEY,
+    person_id INTEGER,                  -- FK to PERSON
+    procedure_concept_id INTEGER,       -- FK to CONCEPT (standard concept)
+    procedure_date DATE,
+    procedure_type_concept_id INTEGER,  -- How procedure was recorded
+    provider_id INTEGER,
+    visit_occurrence_id INTEGER
+);
+
+-- MEASUREMENT: Lab results, vital signs, and other measurements
+MEASUREMENT (
+    measurement_id INTEGER PRIMARY KEY,
+    person_id INTEGER,                  -- FK to PERSON
+    measurement_concept_id INTEGER,     -- FK to CONCEPT (standard concept)
+    measurement_date DATE,
+    measurement_type_concept_id INTEGER,
+    value_as_number REAL,               -- Numeric result
+    value_as_concept_id INTEGER,        -- Categorical result
+    unit_concept_id INTEGER,            -- Unit of measurement
+    range_low REAL,                     -- Normal range lower bound
+    range_high REAL,                    -- Normal range upper bound
+    provider_id INTEGER,
+    visit_occurrence_id INTEGER
+);
+
+-- OBSERVATION: Clinical observations and notes
+OBSERVATION (
+    observation_id INTEGER PRIMARY KEY,
+    person_id INTEGER,                  -- FK to PERSON
+    observation_concept_id INTEGER,     -- FK to CONCEPT (standard concept)
+    observation_date DATE,
+    observation_type_concept_id INTEGER,
+    value_as_number REAL,
+    value_as_string TEXT,
+    value_as_concept_id INTEGER,
+    provider_id INTEGER,
+    visit_occurrence_id INTEGER
+);
+
+-- VISIT_OCCURRENCE: Healthcare visits and encounters
+VISIT_OCCURRENCE (
+    visit_occurrence_id INTEGER PRIMARY KEY,
+    person_id INTEGER,                  -- FK to PERSON
+    visit_concept_id INTEGER,           -- 9201=Inpatient, 9202=Outpatient, 9203=ER
+    visit_start_date DATE,
+    visit_end_date DATE,
+    visit_type_concept_id INTEGER,
+    provider_id INTEGER,
+    care_site_id INTEGER
+);
+
+-- DEATH: Patient death information
+DEATH (
+    person_id INTEGER PRIMARY KEY,      -- FK to PERSON
+    death_date DATE,
+    death_type_concept_id INTEGER,
+    cause_concept_id INTEGER            -- FK to CONCEPT (cause of death)
+);
+
+-- =============================================================================
+-- DERIVED TABLES (Pre-computed for efficiency)
+-- =============================================================================
+
+-- CONDITION_ERA: Continuous periods of condition occurrence
+CONDITION_ERA (
+    condition_era_id INTEGER PRIMARY KEY,
+    person_id INTEGER,                  -- FK to PERSON
+    condition_concept_id INTEGER,       -- FK to CONCEPT
+    condition_era_start_date DATE,      -- Start of continuous period
+    condition_era_end_date DATE,        -- End of continuous period
+    condition_occurrence_count INTEGER  -- Number of occurrences in era
+);
+
+-- DRUG_ERA: Continuous periods of drug exposure
+DRUG_ERA (
+    drug_era_id INTEGER PRIMARY KEY,
+    person_id INTEGER,                  -- FK to PERSON
+    drug_concept_id INTEGER,            -- FK to CONCEPT
+    drug_era_start_date DATE,           -- Start of continuous period
+    drug_era_end_date DATE,             -- End of continuous period
+    drug_exposure_count INTEGER,        -- Number of exposures in era
+    gap_days INTEGER                    -- Gap days allowed in era
+);
+
+-- =============================================================================
+-- VOCABULARY TABLES
+-- =============================================================================
+
+-- CONCEPT: Standard medical concepts (conditions, drugs, procedures, etc.)
+CONCEPT (
+    concept_id INTEGER PRIMARY KEY,
+    concept_name TEXT,                  -- Human readable name
+    domain_id TEXT,                     -- Condition, Drug, Procedure, etc.
+    vocabulary_id TEXT,                 -- SNOMED, RxNorm, CPT, etc.
+    concept_class_id TEXT,              -- Clinical Finding, Ingredient, etc.
+    standard_concept TEXT,              -- 'S' for standard concepts
+    concept_code TEXT,                  -- Original source code
+    valid_start_date DATE,
+    valid_end_date DATE,
+    invalid_reason TEXT
+);
+
+-- CONCEPT_RELATIONSHIP: Relationships between concepts
+CONCEPT_RELATIONSHIP (
+    concept_id_1 INTEGER,               -- FK to CONCEPT
+    concept_id_2 INTEGER,               -- FK to CONCEPT
+    relationship_id TEXT,               -- 'Maps to', 'Is a', etc.
+    valid_start_date DATE,
+    valid_end_date DATE
+);
+
+-- CONCEPT_ANCESTOR: Hierarchical relationships (parent-child)
+CONCEPT_ANCESTOR (
+    ancestor_concept_id INTEGER,        -- FK to CONCEPT (parent)
+    descendant_concept_id INTEGER,      -- FK to CONCEPT (child)
+    min_levels_of_separation INTEGER,   -- Direct parent = 1
+    max_levels_of_separation INTEGER
+);
+
+-- =============================================================================
+-- HEALTH SYSTEM TABLES
+-- =============================================================================
+
+-- PROVIDER: Healthcare providers (doctors, nurses, etc.)
+PROVIDER (
+    provider_id INTEGER PRIMARY KEY,
+    provider_name TEXT,
+    specialty_concept_id INTEGER,       -- FK to CONCEPT
+    care_site_id INTEGER,
+    gender_concept_id INTEGER
+);
+
+-- CARE_SITE: Healthcare facilities
+CARE_SITE (
+    care_site_id INTEGER PRIMARY KEY,
+    care_site_name TEXT,
+    place_of_service_concept_id INTEGER, -- FK to CONCEPT
+    location_id INTEGER
+);
+
+-- LOCATION: Geographic locations
+LOCATION (
+    location_id INTEGER PRIMARY KEY,
+    address_1 TEXT,
+    city TEXT,
+    state TEXT,
+    zip TEXT,
+    county TEXT
+);
+
+-- =============================================================================
+-- KEY RELATIONSHIPS FOR SQL JOINS
+-- =============================================================================
+
+-- Common join patterns:
+-- PERSON.person_id = CONDITION_OCCURRENCE.person_id
+-- PERSON.person_id = DRUG_EXPOSURE.person_id  
+-- PERSON.person_id = PROCEDURE_OCCURRENCE.person_id
+-- PERSON.person_id = VISIT_OCCURRENCE.person_id
+
+-- Concept lookups:
+-- CONDITION_OCCURRENCE.condition_concept_id = CONCEPT.concept_id
+-- DRUG_EXPOSURE.drug_concept_id = CONCEPT.concept_id
+-- PROCEDURE_OCCURRENCE.procedure_concept_id = CONCEPT.concept_id
+
+-- Hierarchical concept searches:
+-- CONCEPT_ANCESTOR.ancestor_concept_id = CONCEPT.concept_id (parent)
+-- CONCEPT_ANCESTOR.descendant_concept_id = CONCEPT.concept_id (child)
+
+-- =============================================================================
+-- COMMON CONCEPT IDs FOR REFERENCE
+-- =============================================================================
+
+-- GENDER CONCEPTS:
+-- 8507 = Male
+-- 8532 = Female
+
+-- COMMON CONDITIONS:
+-- 201826 = Type 2 diabetes mellitus
+-- 313217 = Atrial fibrillation  
+-- 320128 = Essential hypertension
+-- 134057 = Acute myocardial infarction
+-- 133834 = Breast cancer
+
+-- VISIT TYPES:
+-- 9201 = Inpatient Visit
+-- 9202 = Outpatient Visit  
+-- 9203 = Emergency Room Visit
+
+-- =============================================================================
+-- SQL QUERY PATTERNS
+-- =============================================================================
+
+-- Count patients with condition:
+-- SELECT COUNT(DISTINCT person_id) FROM condition_occurrence 
+-- WHERE condition_concept_id IN (concept_ids...)
+
+-- Age calculation:
+-- YEAR(condition_start_date) - year_of_birth AS age_at_diagnosis
+
+-- Date filtering:
+-- WHERE condition_start_date BETWEEN 'YYYY-MM-DD' AND 'YYYY-MM-DD'
+
+-- Gender filtering:
+-- WHERE gender_concept_id = 8507 (Male) OR gender_concept_id = 8532 (Female)
+
+-- Join person with conditions:
+-- FROM person p JOIN condition_occurrence co ON p.person_id = co.person_id

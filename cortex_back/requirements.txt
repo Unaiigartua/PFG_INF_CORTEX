@@ -8,3 +8,10 @@ python-jose
 pydantic
 passlib
 pytest
+requests
+faiss-cpu
+sentence-transformers
+pandas
+numpy
+openpyxl
+python-dotenv
