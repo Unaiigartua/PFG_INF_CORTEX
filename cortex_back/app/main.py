@@ -3,24 +3,23 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-# Importa tus routers originales
-from app.ner import extract_medical_terms
-from app.nerEs import extract_medical_terms_es
-from app.similarity import get_similar_terms
-from app.similarity_bd import get_similar_terms_bd
-from app.models import (
+# Importa tus servicios médicos reorganizados
+from app.medical.ner import extract_medical_terms
+from app.medical.ner_es import extract_medical_terms_es
+from app.medical.similarity import get_similar_terms
+from app.medical.similarity_bd import get_similar_terms_bd
+from app.medical.models import (
     TextInput, TextEntities, Entity,
     SimilarTermInput, SimilarTerm, SimilarTermList
 )
 
-# Importa routers y base de datos de auth
-from app.auth_routes import router as auth_router
+# Importa routers y base de datos de auth reorganizados
+from app.auth.routes import router as auth_router
 from app.query_routes import router as query_router
-from app.auth_database import Base as AuthBase, engine as auth_engine
+from app.auth.database import Base as AuthBase, engine as auth_engine
 
 from dotenv import load_dotenv
 load_dotenv() 
-
 
 app = FastAPI(title="Mi API con Auth + Logs")
 
@@ -34,9 +33,6 @@ app.add_middleware(
 
 # Crea las tablas de autenticación (usuarios y logs) al arrancar
 AuthBase.metadata.create_all(bind=auth_engine)
-
-# Si usas create_all para tus tablas principales, descomenta estas líneas:
-# MainBase.metadata.create_all(bind=main_engine)
 
 print("🔥 Se está ejecutando main.py")
 
@@ -53,11 +49,10 @@ def extract_entities(input: TextInput):
     return TextEntities(entities=entities)
 
 @app.post("/extractEs", response_model=TextEntities)
-def extract_entities(input: TextInput):
+def extract_entities_es(input: TextInput):
     entities_raw = extract_medical_terms_es(input.text)
     entities = [Entity(**e) for e in entities_raw]
     return TextEntities(entities=entities)
-
 
 @app.post("/similar", response_model=SimilarTermList)
 def similar_terms(input: SimilarTermInput):
