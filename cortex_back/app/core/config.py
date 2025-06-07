@@ -15,7 +15,7 @@ OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "deepseek-coder-v2:16b-lite-instruct-q4_K_M")
 
 # Configuración SQL Generation
-SQL_GENERATION_TIMEOUT = int(os.getenv("SQL_GENERATION_TIMEOUT", "180"))  # 3 minutos
+SQL_GENERATION_TIMEOUT = int(os.getenv("SQL_GENERATION_TIMEOUT", "180"))  
 MAX_SQL_ATTEMPTS = int(os.getenv("MAX_SQL_ATTEMPTS", "3"))
 
 # Configuración RAG

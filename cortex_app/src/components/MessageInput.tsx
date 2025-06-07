@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from "react";
-import { Send, RefreshCw, CheckCircle, Circle } from "lucide-react";
+import { Send, RefreshCw, CheckCircle, Circle, Loader2 } from "lucide-react";
 import { useI18n } from "../context/I18nContext";
 import TermValidationModal from "./TermValidationModal";
+import SQLResultView from "./SQLResultView";
 import config from "../config";
 import { useAuth } from "../context/AuthContext";
 
@@ -48,6 +49,31 @@ async function saveQueryToHistory(query: string, token: string | null) {
   }
 }
 
+// Nueva función para generar SQL
+async function generateSQL(question: string, medicalTerms: any[], token: string | null) {
+  if (!token) {
+    throw new Error("Token de autenticación requerido");
+  }
+
+  const response = await fetch(`${config.API_BASE_URL}/sql-generation/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`
+    },
+    body: JSON.stringify({
+      question,
+      medical_terms: medicalTerms
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Error al generar SQL");
+  }
+
+  return response.json();
+}
+
 interface MessageInputProps {
   initialQuery?: string;
 }
@@ -55,10 +81,11 @@ interface MessageInputProps {
 export default function MessageInput({ initialQuery = "" }: MessageInputProps) {
   const [text, setText] = useState(initialQuery);
   const [isFocused, setIsFocused] = useState(false);
-  const [highlightedFragments, setHighlightedFragments] = useState<Array<{text: string, confirmed: boolean}>>([]);
+  const [highlightedFragments, setHighlightedFragments] = useState<Array<{text: string, confirmed: boolean, snomedTerms?: any[]}>>([]);
   const [isProcessed, setIsProcessed] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
-
+  const [isGeneratingSQL, setIsGeneratingSQL] = useState(false);
+  const [sqlResult, setSqlResult] = useState<any>(null);
   const [selectedFragmentIndex, setSelectedFragmentIndex] = useState<number | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   
@@ -77,6 +104,13 @@ export default function MessageInput({ initialQuery = "" }: MessageInputProps) {
     }
   }, [initialQuery, isProcessed]);
 
+  useEffect(() => {
+    if (textareaRef.current && !isProcessed) {
+      // Mantener altura fija en lugar de auto-resize
+      textareaRef.current.style.height = "80px";
+    }
+  }, [text, isProcessed]);
+
   // Verificar si todos los fragmentos están confirmados
   const allFragmentsConfirmed = highlightedFragments.length > 0 && 
     highlightedFragments.every(fragment => fragment.confirmed);
@@ -86,7 +120,7 @@ export default function MessageInput({ initialQuery = "" }: MessageInputProps) {
     
     if (!isProcessed) {
       try {
-        // 👈 Pasamos el idioma actual a la función de extracción
+        // Extraer entidades
         const entities = await extractEntities(text, token, language);
   
         const fragments = entities.map((e: any) => ({
@@ -104,8 +138,32 @@ export default function MessageInput({ initialQuery = "" }: MessageInputProps) {
       } catch (err) {
         console.error("Error al extraer entidades:", err);
       }
-    } else if (allFragmentsConfirmed) {
-      console.log(t('input.executing_query'));
+    } else if (allFragmentsConfirmed && isAuthenticated && token) {
+      // Generar SQL
+      setIsGeneratingSQL(true);
+      try {
+        // Preparar términos médicos para el endpoint
+        const medicalTerms: any[] = [];
+        highlightedFragments.forEach(fragment => {
+          if (fragment.snomedTerms) {
+            fragment.snomedTerms.forEach(snomedTerm => {
+              medicalTerms.push({
+                term: fragment.text,
+                concept_id: snomedTerm.concept_id
+              });
+            });
+          }
+        });
+
+        const result = await generateSQL(text, medicalTerms, token);
+        console.log("Resultado SQL recibido:", result);
+        setSqlResult(result);
+      } catch (err) {
+        console.error("Error al generar SQL:", err);
+        // TODO: Mostrar error al usuario
+      } finally {
+        setIsGeneratingSQL(false);
+      }
     }
   };
 
@@ -121,10 +179,22 @@ export default function MessageInput({ initialQuery = "" }: MessageInputProps) {
     updatedFragments[selectedFragmentIndex] = {
       ...updatedFragments[selectedFragmentIndex],
       confirmed: true,
-      // snomed: selectedTerms, 
+      snomedTerms: selectedTerms, 
     };
     setHighlightedFragments(updatedFragments);
     setSelectedFragmentIndex(null);
+  };
+
+  const handleNewQuery = () => {
+    setIsProcessed(false);
+    setText("");
+    setHighlightedFragments([]);
+    setSqlResult(null);
+  };
+
+  const handleEditQuery = () => {
+    setSqlResult(null);
+    // Mantener el texto y fragmentos para edición
   };
 
   // Función para renderizar el texto con los fragmentos resaltados
@@ -189,92 +259,122 @@ export default function MessageInput({ initialQuery = "" }: MessageInputProps) {
     return <div className="whitespace-pre-wrap">{result}</div>;
   };
 
-  useEffect(() => {
-    if (textareaRef.current && !isProcessed) {
-      // Mantener altura fija en lugar de auto-resize
-      textareaRef.current.style.height = "80px";
-    }
-  }, [text, isProcessed]);
-
   return (
     <>
-    <div className="input-area flex flex-col w-full">
-      <div className="flex-grow bg-transparent p-4 min-h-[80px] relative">
-        {isProcessed ? (
-          <div className="text-base text-[var(--color-text)] min-h-[80px] leading-relaxed">
-            {renderHighlightedText()}
-          </div>
-        ) : (
-          <>
-            <textarea
-              ref={textareaRef}
-              className="w-full bg-transparent resize-none text-base text-[var(--color-text)] outline-none min-h-[80px] max-h-[80px] placeholder-[var(--color-text-muted)] leading-relaxed"
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-              onFocus={() => setIsFocused(true)}
-              onBlur={() => setIsFocused(false)}
-              rows={4}
-              style={{ overflow: 'hidden' }}
-            />
-            {!isFocused && text === "" && (
-              <div className="absolute top-4 left-4 text-[var(--color-text-muted)] pointer-events-none">
-                {t('input.placeholder')}
+      {/* Renderizado condicional SIN return early */}
+      {sqlResult ? (
+        <SQLResultView
+          result={sqlResult}
+          validatedTerms={highlightedFragments
+            .filter(f => f.confirmed && f.snomedTerms)
+            .map(f => ({
+              text: f.text,
+              snomedTerms: f.snomedTerms || []
+            }))
+          }
+          onNewQuery={handleNewQuery}
+          onEditQuery={handleEditQuery}
+        />
+      ) : (
+        <div className="input-area flex flex-col w-full">
+          <div className="flex-grow bg-transparent p-4 min-h-[80px] relative">
+            {isProcessed ? (
+              <div className="text-base text-[var(--color-text)] min-h-[80px] leading-relaxed">
+                {renderHighlightedText()}
               </div>
+            ) : (
+              <>
+                <textarea
+                  ref={textareaRef}
+                  className="w-full bg-transparent resize-none text-base text-[var(--color-text)] outline-none min-h-[80px] max-h-[80px] placeholder-[var(--color-text-muted)] leading-relaxed"
+                  value={text}
+                  onChange={(e) => setText(e.target.value)}
+                  onFocus={() => setIsFocused(true)}
+                  onBlur={() => setIsFocused(false)}
+                  rows={4}
+                  style={{ overflow: 'hidden' }}
+                />
+                {!isFocused && text === "" && (
+                  <div className="absolute top-4 left-4 text-[var(--color-text-muted)] pointer-events-none">
+                    {t('input.placeholder')}
+                  </div>
+                )}
+              </>
             )}
-          </>
-        )}
-      </div>
-      <div className="flex justify-end p-1 px-2 items-center space-x-2">
-        {/* RESET button*/}
-        {isProcessed && (
-          <button
-            onClick={() => {
-              setIsProcessed(false);
-              setText("");
-              setHighlightedFragments([]);
-            }}
-            className="btn-secondary text-sm py-2 px-3"
-          >
-            <RefreshCw className="icon-sm" />
-            {t('input.reset')}
-          </button>
-        )}
-        
-        {/* SEND button */}
-        <div className="relative">
-          <button
-            onClick={handleSend}
-            disabled={(text.trim() === "" && !isProcessed) || (isProcessed && !allFragmentsConfirmed)}
-            className={`btn-primary text-sm py-2 px-3 ${(text.trim() === "" && !isProcessed) || (isProcessed && !allFragmentsConfirmed) ? "opacity-50 cursor-not-allowed" : ""}`}
-            onMouseEnter={() => {
-              if (isProcessed && !allFragmentsConfirmed) {
-                setShowTooltip(true);
-              }
-            }}
-            onMouseLeave={() => {
-              setShowTooltip(false);
-            }}
-          >
-            <Send className="icon-sm" />
-            {t('input.send')}
-          </button>
-          {showTooltip && isProcessed && !allFragmentsConfirmed && (
-            <div className="absolute bottom-full right-0 mb-2 px-3 py-2 bg-text text-white text-xs rounded-lg shadow-lg whitespace-nowrap z-10">
-              {t('input.confirm_terms')}
-              <div className="absolute top-full left-3/4 transform -translate-x-1/2 border-4 border-transparent border-t-text"></div>
+          </div>
+          <div className="flex justify-end p-1 px-2 items-center space-x-2">
+            {/* RESET button*/}
+            {isProcessed && !isGeneratingSQL && (
+              <button
+                onClick={handleNewQuery}
+                className="btn-secondary text-sm py-2 px-3"
+              >
+                <RefreshCw className="icon-sm" />
+                {t('input.reset')}
+              </button>
+            )}
+            
+            {/* SEND button */}
+            <div className="relative">
+              <button
+                onClick={handleSend}
+                disabled={
+                  (text.trim() === "" && !isProcessed) || 
+                  (isProcessed && !allFragmentsConfirmed) || 
+                  (allFragmentsConfirmed && (!isAuthenticated || !token)) ||
+                  isGeneratingSQL
+                }
+                className={`btn-primary text-sm py-2 px-3 ${
+                  (text.trim() === "" && !isProcessed) || 
+                  (isProcessed && !allFragmentsConfirmed) || 
+                  (allFragmentsConfirmed && (!isAuthenticated || !token)) ||
+                  isGeneratingSQL ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+                onMouseEnter={() => {
+                  if (isProcessed && !allFragmentsConfirmed) {
+                    setShowTooltip(true);
+                  }
+                }}
+                onMouseLeave={() => {
+                  setShowTooltip(false);
+                }}
+              >
+                {isGeneratingSQL ? (
+                  <>
+                    <Loader2 className="icon-sm animate-spin" />
+                    Generando SQL...
+                  </>
+                ) : (
+                  <>
+                    <Send className="icon-sm" />
+                    {t('input.send')}
+                  </>
+                )}
+              </button>
+              {showTooltip && isProcessed && !allFragmentsConfirmed && (
+                <div className="absolute bottom-full right-0 mb-2 px-3 py-2 bg-text text-white text-xs rounded-lg shadow-lg whitespace-nowrap z-10">
+                  {t('input.confirm_terms')}
+                  <div className="absolute top-full left-3/4 transform -translate-x-1/2 border-4 border-transparent border-t-text"></div>
+                </div>
+              )}
+              {/* Tooltip para usuario no autenticado */}
+              {isProcessed && allFragmentsConfirmed && (!isAuthenticated || !token) && (
+                <div className="absolute bottom-full right-0 mb-2 px-3 py-2 bg-text text-white text-xs rounded-lg shadow-lg whitespace-nowrap z-10">
+                  {t('input.save_query_login')}
+                  <div className="absolute top-full left-3/4 transform -translate-x-1/2 border-4 border-transparent border-t-text"></div>
+                </div>
+              )}
             </div>
-          )}
+          </div>
         </div>
-      </div>
-    </div>
+      )}
 
-
-    <TermValidationModal
-      term={highlightedFragments[selectedFragmentIndex!]?.text || ""}
-      isOpen={modalOpen}
-      onClose={() => setModalOpen(false)}
-      onConfirm={handleTermConfirm}
-    />
+      <TermValidationModal
+        term={highlightedFragments[selectedFragmentIndex!]?.text || ""}
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onConfirm={handleTermConfirm}
+      />
     </>
   );
 }

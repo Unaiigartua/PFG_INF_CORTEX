@@ -36,7 +36,7 @@ export default function TermValidationModal({
   useEffect(() => {
     if (isOpen && term) {
       setIsLoading(true);
-      fetch(`${config.API_BASE_URL}/test`, {
+      fetch(`${config.API_BASE_URL}/similar_db`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ term }),
