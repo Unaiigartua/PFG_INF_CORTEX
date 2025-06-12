@@ -9,7 +9,6 @@ import faiss
 import numpy as np
 import pandas as pd
 from sentence_transformers import SentenceTransformer
-from app.core.config import DATASET_PATH
 
 logger = logging.getLogger(__name__)
 
@@ -112,7 +111,7 @@ class MedicalSQLRetriever:
 class RAGRetriever:
     """Wrapper más simple para usar en el servicio de generación SQL"""
     
-    def __init__(self, dataset_path: str = DATASET_PATH):
+    def __init__(self, dataset_path: str = "text2sql_epi_dataset_omop.xlsx"):
         self.dataset_path = Path(dataset_path)
         self.retriever: Optional[MedicalSQLRetriever] = None
         self._index_built = False

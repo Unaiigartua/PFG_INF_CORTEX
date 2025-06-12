@@ -3,12 +3,11 @@ from typing import Optional
 from pathlib import Path
 import sqlite3
 import logging
-from app.core.config import OMOP_DB_PATH
 
 logger = logging.getLogger(__name__)
 
 class SQLValidator:
-    def __init__(self, omop_db_path: str = OMOP_DB_PATH):
+    def __init__(self, omop_db_path: str = "omop_testing/omop_test.db"):
         self.omop_db_path = Path(omop_db_path)
         
     def validate_sql_syntax(self, sql: str) -> Optional[str]:

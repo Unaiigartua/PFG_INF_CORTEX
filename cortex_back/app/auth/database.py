@@ -3,8 +3,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
 # Base de datos local para usuarios y logs
-from app.core.config import AUTH_DB_PATH
-SQLALCHEMY_DATABASE_URL = f"sqlite:///{AUTH_DB_PATH}"
+SQLALCHEMY_DATABASE_URL = "sqlite:///./auth.db"
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL,
