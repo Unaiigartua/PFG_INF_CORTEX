@@ -1,7 +1,8 @@
 import { useAuth } from "../context/AuthContext";
 import { useI18n } from "../context/I18nContext";
 import { User, LogOut, LogIn } from "lucide-react";
-import ThemeToggle from "./ThemeToggle";
+import esFlag from '../assets/es-flag.png';
+import ukFlag from '../assets/uk-flag.png';
 
 interface HeaderProps {
   onLoginClick: () => void;
@@ -51,7 +52,7 @@ export default function Header({ onLoginClick }: HeaderProps) {
           title="Español"
         >
           <img 
-            src="src/assets/es-flag.png" 
+            src={esFlag}
             alt="Español" 
             className="w-12 h-9 rounded-lg" 
           />
@@ -66,7 +67,7 @@ export default function Header({ onLoginClick }: HeaderProps) {
           title="English"
         >
           <img 
-            src="src/assets/uk-flag.png" 
+            src={ukFlag}
             alt="English" 
             className="w-12 h-9 rounded-lg" 
           />

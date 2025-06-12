@@ -8,6 +8,7 @@ from typing import List, Tuple, Optional, Dict, Any
 import os
 import logging
 from pathlib import Path
+from app.core.config import FAISS_INDEX_PATH, ID_MAPPING_PATH, OMOP_CONCEPTS_DB, SYNONYMS_PATH
 
 logger = logging.getLogger(__name__)
 class MedicalEntityLinker:
@@ -27,10 +28,13 @@ class MedicalEntityLinker:
         self.BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
         
         self.MODEL_NAME = "pritamdeka/BioBERT-mnli-snli-scinli-scitail-mednli-stsb"
-        self.FAISS_INDEX_PATH = os.path.join(self.BASE_DIR, "app/OMOP_SNOMED/faiss_snomed.index")
-        self.ID_MAPPING_PATH = os.path.join(self.BASE_DIR, "app/OMOP_SNOMED/concept_ids.pkl")
-        self.SYNONYMS_PATH = os.path.join(self.BASE_DIR, "app/OMOP_SNOMED/synonyms.parquet")
-        self.DB_PATH = os.path.join(self.BASE_DIR, "app/OMOP_SNOMED/omop_snomed.db")
+        
+
+    
+        self.FAISS_INDEX_PATH = FAISS_INDEX_PATH
+        self.ID_MAPPING_PATH = ID_MAPPING_PATH 
+        self.SYNONYMS_PATH = SYNONYMS_PATH
+        self.DB_PATH = OMOP_CONCEPTS_DB
 
         self.embedding_cache = {}
         

@@ -6,6 +6,7 @@ from .models import SQLGenerationRequest, SQLGenerationResponse, SimilarExample,
 from .ollama_client import OllamaClient
 from .sql_validator import SQLValidator
 from .rag_retriever import RAGRetriever
+from app.core.config import OMOP_SCHEMA_PATH
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +28,8 @@ class SQLGenerationService:
         self.timeout = timeout
         
         # Schema OMOP (cargar desde archivo si existe)
-        schema_path = Path("omop_schema_stub.txt")
+        
+        schema_path = Path(OMOP_SCHEMA_PATH)
         if schema_path.exists():
             with open(schema_path, "r") as f:
                 self.omop_schema = f.read()

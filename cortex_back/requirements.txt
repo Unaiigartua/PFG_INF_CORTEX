@@ -15,3 +15,7 @@ pandas
 numpy
 openpyxl
 python-dotenv
+fastparquet
+pyarrow
+pydantic[email]
+python-multipart

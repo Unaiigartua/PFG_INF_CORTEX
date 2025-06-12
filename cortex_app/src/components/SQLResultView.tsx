@@ -1,6 +1,5 @@
 import { useState, useRef } from "react";
 import { Play, RefreshCw, CheckCircle, AlertCircle, ChevronDown, ChevronUp, Edit3 } from "lucide-react";
-import { useI18n } from "../context/I18nContext";
 import Editor from '@monaco-editor/react';
 import { useTheme } from "../context/ThemeContext";
 import type { editor } from 'monaco-editor';
@@ -42,7 +41,6 @@ export default function SQLResultView({
   const [sqlCode, setSqlCode] = useState(result.generated_sql);
   const [showErrorDetails, setShowErrorDetails] = useState(false);
   const [isExecuting, setIsExecuting] = useState(false);
-  const { t } = useI18n();
   const { theme } = useTheme();
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
 

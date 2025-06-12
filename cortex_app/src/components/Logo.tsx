@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useTheme } from '../context/ThemeContext';
 import { useI18n } from '../context/I18nContext';
+import logoImg from '../assets/logo-cortex-t.png';
 
 export default function Logo() {
   const [showText, setShowText] = useState(false);
@@ -15,7 +16,7 @@ export default function Logo() {
     >
       {/* Logo con filtro automático para modo oscuro */}
       <img 
-        src="src/assets/logo-cortex-t.png" 
+        src={logoImg} 
         alt="Cortex Logo" 
         className={`w-24 h-24 mb-4 drop-shadow-xl transition-all duration-300 ${
           theme === 'dark' 

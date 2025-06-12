@@ -3,11 +3,14 @@ import json
 import time
 from typing import Optional
 import logging
+import os
 
 logger = logging.getLogger(__name__)
 
 class OllamaClient:
-    def __init__(self, base_url: str = "http://localhost:11434"):
+    def __init__(self, base_url: str = None):
+        if base_url is None:
+            base_url = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
         self.base_url = base_url
         self.session = requests.Session()
         
