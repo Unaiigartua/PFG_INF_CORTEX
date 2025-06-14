@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 import logging
+import time
 
 from .models import SQLGenerationRequest, SQLGenerationResponse
 from .service import SQLGenerationService
@@ -30,6 +31,12 @@ def get_sql_service() -> SQLGenerationService:
             )
     return sql_service
 
+def generate_title(question: str, max_length: int = 80) -> str:
+    """Generar título a partir de la pregunta (primeros N caracteres)"""
+    if len(question) <= max_length:
+        return question
+    return question[:max_length-3] + "..."
+
 @router.post("/", response_model=SQLGenerationResponse)
 def generate_sql(
     request: SQLGenerationRequest,
@@ -40,24 +47,53 @@ def generate_sql(
     """
     Generar consulta SQL desde lenguaje natural.
     
-    Requiere autenticación JWT y registra la consulta en los logs del usuario.
+    Requiere autenticación JWT y registra la consulta completa en los logs del usuario.
     """
+    start_time = time.time()
+    
     try:
-        # Registrar la consulta en el log del usuario
-        log_entry = QueryLog(
-            user_id=current_user.id,
-            query_text=f"SQL Generation: {request.question}"
-        )
-        db.add(log_entry)
-        db.commit()
-        
         # Generar SQL
         logger.info(f"Generando SQL para usuario {current_user.id}: {request.question}")
         result = service.generate_sql(request)
         
+        # Calcular tiempo de procesamiento
+        processing_time = time.time() - start_time
+        
+        # Generar título automáticamente
+        title = generate_title(request.question)
+        
+        # Convertir medical_terms a lista si es necesario
+        medical_terms_list = None
+        if request.medical_terms:
+            # Asumir que medical_terms puede ser una lista de objetos o strings
+            if isinstance(request.medical_terms, list):
+                if request.medical_terms and isinstance(request.medical_terms[0], dict):
+                    # Si son objetos con términos, extraer los términos
+                    medical_terms_list = [term.get('term', str(term)) for term in request.medical_terms]
+                else:
+                    # Si ya son strings
+                    medical_terms_list = [str(term) for term in request.medical_terms]
+        
+        # Registrar la consulta completa en el log del usuario
+        query_log = QueryLog(
+            user_id=current_user.id,
+            title=title,
+            question=request.question,
+            medical_terms=medical_terms_list,
+            generated_sql=result.generated_sql,
+            is_executable=result.is_executable,
+            attempts_count=result.attempts_count,
+            error_message=result.error_message,
+            processing_time=processing_time,
+        )
+        
+        db.add(query_log)
+        db.commit()
+        db.refresh(query_log)
+        
         # Log del resultado
         if result.is_executable:
-            logger.info(f"SQL generado exitosamente en {result.attempts_count} intentos")
+            logger.info(f"SQL generado exitosamente en {result.attempts_count} intentos, tiempo: {processing_time:.2f}s")
         else:
             logger.warning(f"SQL no ejecutable después de {result.attempts_count} intentos: {result.error_message}")
         
@@ -65,6 +101,7 @@ def generate_sql(
         
     except Exception as e:
         logger.error(f"Error generando SQL: {e}")
+        db.rollback()
         raise HTTPException(
             status_code=500,
             detail=f"Error interno generando SQL: {str(e)}"
@@ -78,19 +115,24 @@ def health_check(service: SQLGenerationService = Depends(get_sql_service)):
     No requiere autenticación para facilitar monitoreo.
     """
     try:
-        ollama_running = service.ollama_client.is_ollama_running()
-        model_available = service.ollama_client.check_model_availability(service.model_name)
+        # Verificar que el servicio esté disponible
+        if service is None:
+            return {
+                "status": "unhealthy",
+                "service": "sql_generation",
+                "error": "Service not initialized"
+            }
         
         return {
-            "status": "healthy" if ollama_running and model_available else "unhealthy",
-            "ollama_running": ollama_running,
-            "model_available": model_available,
-            "model_name": service.model_name,
-            "available_models": service.ollama_client.list_models()
+            "status": "healthy",
+            "service": "sql_generation",
+            "model": service.model_name if hasattr(service, 'model_name') else "unknown"
         }
+        
     except Exception as e:
         logger.error(f"Error en health check: {e}")
         return {
-            "status": "error",
+            "status": "unhealthy",
+            "service": "sql_generation",
             "error": str(e)
         }

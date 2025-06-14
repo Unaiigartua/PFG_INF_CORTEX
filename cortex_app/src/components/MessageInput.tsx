@@ -29,27 +29,12 @@ async function extractEntities(text: string, token: string | null, language: 'es
   return data.entities; 
 }
 
-async function saveQueryToHistory(query: string, token: string | null) {
-  if (!token) return;
-  
-  try {
-    await fetch(`${config.API_BASE_URL}/queries/`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
-      },
-      body: JSON.stringify({ query_text: query }),
-    });
-  } catch (error) {
-    console.error("Error saving query to history:", error);
-  }
-}
 
 async function generateSQL(question: string, medicalTerms: any[], token: string | null) {
   if (!token) {
     throw new Error("Token de autenticación requerido");
   }
+
 
   const response = await fetch(`${config.API_BASE_URL}/sql-generation/`, {
     method: "POST",
@@ -129,9 +114,6 @@ export default function MessageInput({ initialQuery = "" }: MessageInputProps) {
         setHighlightedFragments(fragments);
         setIsProcessed(true);
         
-        if (isAuthenticated) {
-          saveQueryToHistory(text, token);
-        }
       } catch (err) {
         console.error("Error al extraer entidades:", err);
       }

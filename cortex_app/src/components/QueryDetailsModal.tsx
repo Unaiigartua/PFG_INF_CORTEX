@@ -76,25 +76,25 @@ export default function QueryDetailsModal({ isOpen, onClose, query }: QueryDetai
 
               {/* Estado y métricas */}
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                <div className="bg-gray-200 border border-gray-300 p-4 rounded-lg">
-                  <div className="text-sm text-gray-700 font-medium">Estado</div>
+                <div className="bg-gray-100 border border-gray-200 p-4 rounded-lg">
+                  <div className="text-sm text-gray-600 font-medium">Estado</div>
                   <div className="flex items-center gap-2 mt-2">
                     {getStatusIcon(query.is_executable, query.attempts_count)}
-                    <span className="font-semibold text-gray-900">
+                    <span className="font-semibold text-gray-800">
                       {query.is_executable ? 'Ejecutable' : 'No ejecutable'}
                     </span>
                   </div>
                 </div>
                 
-                <div className="bg-gray-200 border border-gray-300 p-4 rounded-lg">
-                  <div className="text-sm text-gray-700 font-medium">Intentos</div>
-                  <div className="font-bold text-2xl text-gray-900 mt-1">{query.attempts_count}</div>
+                <div className="bg-gray-100 border border-gray-200 p-4 rounded-lg">
+                  <div className="text-sm text-gray-600 font-medium">Intentos</div>
+                  <div className="font-bold text-2xl text-gray-800 mt-1">{query.attempts_count}</div>
                 </div>
                 
                 {query.processing_time && (
-                  <div className="bg-gray-200 border border-gray-300 p-4 rounded-lg">
-                    <div className="text-sm text-gray-700 font-medium">Tiempo</div>
-                    <div className="font-bold text-2xl text-gray-900 mt-1">{query.processing_time.toFixed(2)}s</div>
+                  <div className="bg-gray-100 border border-gray-200 p-4 rounded-lg">
+                    <div className="text-sm text-gray-600 font-medium">Tiempo</div>
+                    <div className="font-bold text-2xl text-gray-800 mt-1">{query.processing_time.toFixed(2)}s</div>
                   </div>
                 )}
               </div>

@@ -159,6 +159,7 @@ def root():
             "similarity_health": "/similarity/health",
             "similarity_stats": "/similarity/stats",
             "sql_generation": "/sql-generation/",
+            "queries": "/queries/",
             "health": "/sql-generation/health"
         }
     }

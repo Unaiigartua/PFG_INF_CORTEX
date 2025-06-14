@@ -1,33 +1,8 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel
 from datetime import datetime
-from typing import Optional, List, Dict, Any
+from typing import Optional, List
 
-# Schemas existentes para usuarios (mantener compatibilidad)
-class UserCreate(BaseModel):
-    email: EmailStr
-    password: str
-
-class UserOut(BaseModel):
-    id: int
-    email: EmailStr
-    is_active: bool
-    created_at: datetime
-
-    class Config:
-        orm_mode = True
-
-class Token(BaseModel):
-    access_token: str
-    token_type: str
-
-class TokenData(BaseModel):
-    user_id: int | None = None
-
-# Schema simple existente
-class QueryLogIn(BaseModel):
-    query_text: str
-
-# Nuevos schemas para QueryLog
+# Nuevos schemas para el sistema mejorado de QueryLog
 class QueryLogCreate(BaseModel):
     question: str
     medical_terms: Optional[List[str]] = None
@@ -36,7 +11,6 @@ class QueryLogCreate(BaseModel):
     attempts_count: int = 1
     error_message: Optional[str] = None
     processing_time: Optional[float] = None
-    results_count: Optional[int] = None
 
 class QueryLogResponse(BaseModel):
     id: int
@@ -48,7 +22,6 @@ class QueryLogResponse(BaseModel):
     attempts_count: int
     error_message: Optional[str]
     processing_time: Optional[float]
-    results_count: Optional[int]
     timestamp: datetime
 
     class Config:
@@ -65,7 +38,3 @@ class QueryLogSummary(BaseModel):
 
     class Config:
         from_attributes = True
-
-# Schema para el input simple (mantener compatibilidad)
-class QueryLogIn(BaseModel):
-    query_text: str

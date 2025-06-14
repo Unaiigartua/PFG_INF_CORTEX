@@ -582,3 +582,239 @@
   border-color: rgba(110, 160, 133, 0.6);
   box-shadow: 0 2px 8px rgba(110, 160, 133, 0.2);
 }
+
+
+/* ========== MODAL DE DETALLES DEL HISTORIAL ========== */
+
+/* Animación de aparición para el modal */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.2s ease-out;
+}
+
+/* Asegurar que el historial drawer ocupe toda la altura */
+.history-drawer {
+  height: 100vh !important;
+  max-height: 100vh !important;
+}
+
+.history-content {
+  height: calc(100vh - 4rem) !important;
+  max-height: calc(100vh - 4rem) !important;
+}
+
+
+/* ========== MODAL DE DETALLES DEL HISTORIAL ========== */
+
+/* Animación de aparición para el modal - igual que TermValidationModal */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-fade-in-down {
+  animation: fadeInDown 0.4s ease-out forwards;
+}
+
+/* Asegurar que el historial drawer ocupe toda la altura */
+.history-drawer {
+  height: 100vh !important;
+  max-height: 100vh !important;
+}
+
+.history-content {
+  height: calc(100vh - 4rem) !important;
+  max-height: calc(100vh - 4rem) !important;
+}
+
+/* Botón cancelar estilo consistente */
+.btn-cancel {
+  background-color: var(--color-background-soft);
+  color: var(--color-text);
+  border-color: var(--color-secondary)/30;
+}
+
+.btn-cancel:hover {
+  background-color: var(--color-background);
+  border-color: var(--color-secondary)/50;
+  color: var(--color-text-light);
+}
+
+/* ========== MODO OSCURO PARA QUERY DETAILS MODAL ========== */
+
+/* Modal content en modo oscuro */
+[data-theme="dark"] .modal-content {
+  background-color: var(--color-background-card);
+  border: 1px solid rgba(110, 160, 133, 0.3);
+}
+
+/* Header del modal en modo oscuro - SIN degradados */
+[data-theme="dark"] .modal-header {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+/* Títulos en modo oscuro */
+[data-theme="dark"] .modal-content h4 {
+  color: var(--color-text) !important;
+}
+
+/* Pregunta original en modo oscuro */
+[data-theme="dark"] .modal-content .bg-gray-100 {
+  background-color: rgba(80, 90, 85, 0.8) !important;
+  border-color: rgba(110, 160, 133, 0.4) !important;
+}
+
+[data-theme="dark"] .modal-content .text-gray-700 {
+  color: var(--color-text-light) !important;
+}
+
+[data-theme="dark"] .modal-content .text-gray-800 {
+  color: var(--color-text) !important;
+}
+
+[data-theme="dark"] .modal-content .text-gray-600 {
+  color: var(--color-text-muted) !important;
+}
+
+/* Cards de métricas en modo oscuro */
+[data-theme="dark"] .modal-content .border-gray-200 {
+  border-color: rgba(110, 160, 133, 0.4) !important;
+  background-color: rgba(70, 80, 75, 0.8) !important;
+}
+
+/* Badges en modo oscuro - SIN degradados */
+[data-theme="dark"] .modal-content .bg-blue-100 {
+  background-color: rgba(59, 130, 246, 0.2) !important;
+  border-color: rgba(59, 130, 246, 0.5) !important;
+}
+
+[data-theme="dark"] .modal-content .text-blue-800 {
+  color: rgba(147, 197, 253, 1) !important;
+}
+
+/* SQL code block en modo oscuro */
+[data-theme="dark"] .modal-content pre {
+  background-color: rgba(17, 24, 39, 1) !important;
+  border-color: rgba(110, 160, 133, 0.4) !important;
+}
+
+/* Error message en modo oscuro */
+[data-theme="dark"] .modal-content .bg-red-50 {
+  background-color: rgba(127, 29, 29, 0.3) !important;
+  border-color: rgba(239, 68, 68, 0.6) !important;
+}
+
+[data-theme="dark"] .modal-content .text-red-700 {
+  color: rgb(248, 113, 113) !important;
+}
+
+[data-theme="dark"] .modal-content .border-red-200 {
+  border-color: rgba(239, 68, 68, 0.4) !important;
+}
+
+[data-theme="dark"] .modal-content .border-l-red-500 {
+  border-left-color: rgba(239, 68, 68, 0.8) !important;
+}
+
+/* Footer border en modo oscuro */
+[data-theme="dark"] .modal-content .border-t {
+  border-color: rgba(110, 160, 133, 0.3) !important;
+}
+
+/* Botón cancelar en modo oscuro */
+[data-theme="dark"] .btn-cancel {
+  background-color: rgba(70, 80, 75, 0.9);
+  color: var(--color-text-light);
+  border-color: rgba(110, 160, 133, 0.4);
+}
+
+[data-theme="dark"] .btn-cancel:hover {
+  background-color: rgba(90, 100, 95, 0.95);
+  color: var(--color-text);
+  border-color: rgba(110, 160, 133, 0.6);
+}
+
+/* ========== MODO OSCURO PARA HISTORIAL LATERAL ========== */
+
+/* Drawer del historial en modo oscuro */
+[data-theme="dark"] .history-drawer {
+  background-color: var(--color-background-card);
+  border-right-color: rgba(110, 160, 133, 0.3);
+}
+
+/* Header del historial en modo oscuro */
+[data-theme="dark"] .history-drawer .modal-header {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+/* Items del historial en modo oscuro */
+[data-theme="dark"] .history-drawer .border-secondary\/10 {
+  border-color: rgba(110, 160, 133, 0.2);
+}
+
+[data-theme="dark"] .history-drawer .hover\:border-primary\/30:hover {
+  border-color: rgba(110, 160, 133, 0.4);
+}
+
+[data-theme="dark"] .history-drawer .hover\:bg-background-soft:hover {
+  background-color: rgba(60, 70, 65, 0.8);
+}
+
+/* Textos del historial en modo oscuro */
+[data-theme="dark"] .history-drawer .text-primary {
+  color: var(--color-text);
+}
+
+[data-theme="dark"] .history-drawer .text-text-muted {
+  color: var(--color-text-muted);
+}
+
+/* Mensaje cuando no hay consultas en modo oscuro */
+[data-theme="dark"] .history-drawer .text-text-muted {
+  color: var(--color-text-muted);
+}
+
+/* Botones de acción en modo oscuro */
+[data-theme="dark"] .history-drawer .bg-blue-100 {
+  background-color: rgba(59, 130, 246, 0.2);
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+[data-theme="dark"] .history-drawer .text-blue-700 {
+  color: rgba(147, 197, 253, 1);
+}
+
+[data-theme="dark"] .history-drawer .hover\:bg-blue-200:hover {
+  background-color: rgba(59, 130, 246, 0.3);
+}
+
+[data-theme="dark"] .history-drawer .bg-red-100 {
+  background-color: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+[data-theme="dark"] .history-drawer .text-red-700 {
+  color: rgb(248, 113, 113);
+}
+
+[data-theme="dark"] .history-drawer .hover\:bg-red-200:hover {
+  background-color: rgba(239, 68, 68, 0.3);
+}
