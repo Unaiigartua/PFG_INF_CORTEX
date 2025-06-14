@@ -1,38 +1,121 @@
-import { X, CheckCircle, XCircle, AlertCircle } from "lucide-react";
-import { QueryLogDetail } from "../utils/api";
+import { useState, useEffect } from "react";
+import { X, Loader2, AlertCircle, CheckCircle2 } from "lucide-react";
+import { useI18n } from "../context/I18nContext";
+import config from "../config";
 import ModalPortal from "./ModalPortal";
 
-interface QueryDetailsModalProps {
+interface LoginModalProps {
   isOpen: boolean;
   onClose: () => void;
-  query: QueryLogDetail | null;
+  onLoginSuccess: (token: string) => void;
 }
 
-export default function QueryDetailsModal({ isOpen, onClose, query }: QueryDetailsModalProps) {
-  if (!isOpen || !query) return null;
+export default function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginModalProps) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isRegistering, setIsRegistering] = useState(false);
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [success, setSuccess] = useState("");
+  const { t } = useI18n();
 
-  const getStatusIcon = (isExecutable: boolean, attemptsCount: number) => {
-    if (isExecutable) {
-      return <CheckCircle className="w-4 h-4 text-green-500" />;
-    } else if (attemptsCount > 1) {
-      return <AlertCircle className="w-4 h-4 text-orange-500" />;
-    } else {
-      return <XCircle className="w-4 h-4 text-red-500" />;
+  // Limpiar campos cuando se abre/cierra el modal o cambia el modo
+  useEffect(() => {
+    if (isOpen) {
+      setEmail("");
+      setPassword("");
+      setError("");
+      setSuccess("");
+    }
+  }, [isOpen, isRegistering]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
+    setIsLoading(true);
+
+    try {
+      if (isRegistering) {
+        // Register
+        const registerResponse = await fetch(`${config.API_BASE_URL}/auth/register`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        });
+
+        if (!registerResponse.ok) {
+          const errorData = await registerResponse.json();
+          throw new Error(errorData.detail || t('login.registration_error'));
+        }
+
+        // Mostrar mensaje de éxito y cambiar a login
+        setSuccess(t('login.register_success'));
+        setIsRegistering(false);
+        setPassword(""); // Limpiar contraseña pero mantener email
+        setIsLoading(false);
+        return;
+      }
+
+      // Login - using OAuth2 password flow format
+      const formData = new URLSearchParams();
+      formData.append("username", email);
+      formData.append("password", password);
+
+      const loginResponse = await fetch(`${config.API_BASE_URL}/auth/login`, {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/x-www-form-urlencoded" 
+        },
+        body: formData,
+      });
+
+      if (!loginResponse.ok) {
+        const errorData = await loginResponse.json();
+        throw new Error(errorData.detail || t('login.invalid_credentials'));
+      }
+
+      const data = await loginResponse.json();
+      setSuccess(t('login.login_success'));
+      
+      // Pequeña pausa para mostrar el éxito antes de cerrar
+      setTimeout(() => {
+        onLoginSuccess(data.access_token);
+        setEmail("");
+        setPassword("");
+        setError("");
+        setSuccess("");
+      }, 500);
+      
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t('login.auth_error'));
+    } finally {
+      setIsLoading(false);
     }
   };
 
+  const toggleMode = () => {
+    setIsRegistering(!isRegistering);
+    setError("");
+    setSuccess("");
+    setPassword(""); // Limpiar contraseña al cambiar modo
+  };
+
+  if (!isOpen) return null;
+
   return (
     <ModalPortal>
-      <div 
+      <div
         className="modal-overlay"
         onClick={(e) => e.target === e.currentTarget && onClose()}
+        style={{ top: 0, left: 0, right: 0, bottom: 0 }}
       >
-        <div 
-          className="modal-content w-full max-w-5xl max-h-[90vh] animate-fade-in-down m-4"
-        >
+        <div className="modal-content w-full max-w-md m-4 animate-fade-in-down">
           {/* Header */}
           <div className="modal-header">
-            <h2 className="text-xl font-semibold">Detalles de la consulta</h2>
+            <h2 className="text-xl font-semibold">
+              {isRegistering ? t('login.register_title') : t('login.title')}
+            </h2>
             <button 
               onClick={onClose}
               className="text-white/90 hover:text-white hover:bg-white/20 p-2 rounded-lg transition-all duration-200 hover:rotate-90"
@@ -41,85 +124,75 @@ export default function QueryDetailsModal({ isOpen, onClose, query }: QueryDetai
             </button>
           </div>
 
-          {/* Content area */}
-          <div className="p-6 overflow-auto max-h-[70vh]">
-            <div className="space-y-6">
-              {/* Pregunta original */}
-              <div>
-                <h4 className="font-semibold text-gray-800 mb-2">Pregunta original:</h4>
-                <p className="text-gray-700 bg-gray-100 p-4 rounded-lg border border-gray-200">{query.question}</p>
-              </div>
-
-              {/* Términos médicos */}
-              {query.medical_terms && query.medical_terms.length > 0 && (
-                <div>
-                  <h4 className="font-semibold text-gray-800 mb-2">Términos médicos validados:</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {query.medical_terms.map((term, index) => (
-                      <span key={index} className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm border border-blue-200">
-                        {term}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* SQL generado */}
-              {query.generated_sql && (
-                <div>
-                  <h4 className="font-semibold text-gray-800 mb-2">SQL generado:</h4>
-                  <pre className="text-sm bg-gray-900 text-green-400 p-4 rounded-lg overflow-auto border border-gray-300">
-                    {query.generated_sql}
-                  </pre>
-                </div>
-              )}
-
-              {/* Estado y métricas */}
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                <div className="bg-gray-200 border border-gray-300 p-4 rounded-lg">
-                  <div className="text-sm text-gray-700 font-medium">Estado</div>
-                  <div className="flex items-center gap-2 mt-2">
-                    {getStatusIcon(query.is_executable, query.attempts_count)}
-                    <span className="font-semibold text-gray-900">
-                      {query.is_executable ? 'Ejecutable' : 'No ejecutable'}
-                    </span>
-                  </div>
-                </div>
-                
-                <div className="bg-gray-200 border border-gray-300 p-4 rounded-lg">
-                  <div className="text-sm text-gray-700 font-medium">Intentos</div>
-                  <div className="font-bold text-2xl text-gray-900 mt-1">{query.attempts_count}</div>
-                </div>
-                
-                {query.processing_time && (
-                  <div className="bg-gray-200 border border-gray-300 p-4 rounded-lg">
-                    <div className="text-sm text-gray-700 font-medium">Tiempo</div>
-                    <div className="font-bold text-2xl text-gray-900 mt-1">{query.processing_time.toFixed(2)}s</div>
-                  </div>
-                )}
-              </div>
-
-              {/* Error si existe */}
-              {query.error_message && (
-                <div>
-                  <h4 className="font-semibold text-red-700 mb-2">Error:</h4>
-                  <p className="text-red-700 bg-red-50 p-4 rounded-lg border border-red-200 border-l-4 border-l-red-500">
-                    {query.error_message}
-                  </p>
-                </div>
-              )}
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="p-6 space-y-5">
+          
+          {/* Mensajes de estado */}
+          {error && (
+            <div className="bg-[var(--color-error)]/10 border border-[var(--color-error)]/30 text-[var(--color-error)] px-4 py-3 rounded-xl flex items-center gap-3">
+              <AlertCircle className="icon-md flex-shrink-0" />
+              <span className="font-medium">{error}</span>
             </div>
+          )}
+
+          {success && (
+            <div className="bg-[var(--color-success)]/10 border border-[var(--color-success)]/30 text-[var(--color-success)] px-4 py-3 rounded-xl flex items-center gap-3">
+              <CheckCircle2 className="icon-md flex-shrink-0" />
+              <span className="font-medium">{success}</span>
+            </div>
+          )}
+
+          <div className="space-y-2">
+            <label className="block text-sm font-semibold text-[var(--color-text)]">{t('login.email')}</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full px-4 py-3 border border-[var(--color-secondary)]/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] transition-all duration-200 bg-[var(--color-background)] text-[var(--color-text)] placeholder-[var(--color-text-muted)]"
+              required
+              placeholder={t('login.email_placeholder')}
+            />
           </div>
 
-          {/* Footer con botones */}
-          <div className="flex justify-end space-x-4 p-6 border-t">
+          <div className="space-y-2">
+            <label className="block text-sm font-semibold text-[var(--color-text)]">{t('login.password')}</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full px-4 py-3 border border-[var(--color-secondary)]/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] transition-all duration-200 bg-[var(--color-background)] text-[var(--color-text)] placeholder-[var(--color-text-muted)]"
+              required
+              placeholder={t('login.password_placeholder')}
+            />
+          </div>
+
+          <div className="flex justify-between items-center pt-4">
             <button
-              onClick={onClose}
-              className="btn-cancel px-6 py-2 font-medium rounded-xl transition-all duration-200 border"
+              type="button"
+              onClick={toggleMode}
+              className="text-[var(--color-primary)] hover:text-[var(--color-primary-dark)] hover:underline transition-all duration-200 text-sm font-medium px-2 py-1 rounded-lg hover:bg-[var(--color-primary)]/5"
             >
-              Cerrar
+              {isRegistering ? t('login.toggle_login') : t('login.toggle_register')}
+            </button>
+
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed min-w-[140px]"
+            >
+              {isLoading ? (
+                <span className="flex items-center gap-2">
+                  <Loader2 className="icon-sm animate-spin" />
+                  {t('login.loading')}
+                </span>
+              ) : isRegistering ? (
+                t('login.register')
+              ) : (
+                t('login.login')
+              )}
             </button>
           </div>
+          </form>
         </div>
       </div>
     </ModalPortal>
