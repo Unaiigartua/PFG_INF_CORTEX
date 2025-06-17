@@ -36,6 +36,12 @@ const translations = {
     'input.executing_query': 'Ejecutando consulta SQL...',
     'input.extracting_terms': 'Extrayendo términos...',
     'input.save_query_login': 'Inicia sesión para guardar tu consulta',
+    'input.end_edit': 'Finalizar',
+    'input.edit': 'Editar',
+    'input.select_edit': 'Seleccionado',
+    'input.add_term': 'Añadir término',
+    'input.delete_term': 'Click para eliminar término',
+    'input.generate_sql': 'Generando SQL...',
     
     // Examples
     'examples.title': 'Ejemplos',
@@ -142,6 +148,7 @@ const translations = {
     'login.invalid_credentials': 'Invalid credentials',
     'login.registration_error': 'Registration error',
     'login.auth_error': 'Authentication error',
+  
     
     // Message Input
     'input.placeholder': 'Write your query...',
@@ -151,6 +158,14 @@ const translations = {
     'input.executing_query': 'Executing SQL query...',
     'input.extracting_terms': 'Extracting terms...',
     'input.save_query_login': 'Sign in to save your query',
+    'input.end_edit': 'Finish',
+    'input.edit': 'Edit',
+    'input.select_edit': 'Selected',
+    'input.add_term': 'Add term',
+    'input.delete_term': 'Click to delete term',
+    'input.generate_sql': 'Generating SQL...',
+
+
     
     // Examples
     'examples.title': 'Examples',

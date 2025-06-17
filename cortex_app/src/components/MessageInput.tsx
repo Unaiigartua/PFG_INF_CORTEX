@@ -298,7 +298,7 @@ export default function MessageInput({ initialQuery = "" }: MessageInputProps) {
                 ? 'bg-[var(--color-success)]/20 border border-[var(--color-success)]/40 text-[var(--color-success)] shadow-sm' 
                 : 'bg-[var(--color-secondary)]/20 border border-[var(--color-secondary)]/40 text-[var(--color-secondary-dark)] hover:bg-[var(--color-secondary)]/30 shadow-sm'
           }`}
-          title={isEditMode ? 'Click para eliminar' : undefined}
+          title={isEditMode ? t('input.delete_term') : undefined}
         >
           {fragment.text}
           {!isEditMode && (
@@ -385,13 +385,13 @@ export default function MessageInput({ initialQuery = "" }: MessageInputProps) {
             <div className="px-4 pb-2">
               <div className="flex items-center justify-between bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/30 rounded-lg px-3 py-2">
                 <span className="text-sm text-[var(--color-text)]">
-                  Seleccionado: "<strong>{text.slice(selection.start, selection.end)}</strong>"
+                  {t('input.select_edit')}: "<strong>{text.slice(selection.start, selection.end)}</strong>"
                 </span>
                 <button
                   onClick={addSelectedTerm}
                   className="btn-primary text-xs py-1 px-3"
                 >
-                  Añadir término
+                  {t('input.add_term')}
                 </button>
               </div>
             </div>
@@ -419,7 +419,7 @@ export default function MessageInput({ initialQuery = "" }: MessageInputProps) {
                 title={isEditMode ? 'Salir del modo edición' : 'Editar términos detectados'}
               >
                 <Highlighter className="icon-sm" />
-                {isEditMode ? 'Finalizar' : 'Editar'}
+                {isEditMode ? t('input.end_edit') : t('input.edit')}
               </button>
             )}
             
@@ -452,7 +452,7 @@ export default function MessageInput({ initialQuery = "" }: MessageInputProps) {
                 {isGeneratingSQL ? (
                   <>
                     <Loader2 className="icon-sm animate-spin" />
-                    Generando SQL...
+                    {t('input.generate_sql')}
                   </>
                 ) : (
                   <>
