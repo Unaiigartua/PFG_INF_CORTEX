@@ -81,7 +81,7 @@ class SQLGenerationService:
                 model_name=self.model_name,
                 prompt=prompt,
                 temperature=0.05,
-                max_tokens=400,
+                max_tokens=700,
                 timeout=self.timeout // self.max_attempts
             )
             

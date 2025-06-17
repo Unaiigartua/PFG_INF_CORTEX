@@ -96,6 +96,7 @@ export default function QueryHistory({ isOpen, onClose, onSelect }: QueryHistory
     }
   };
 
+
   return (
     <>
       {/* Overlay sin difuminar el header */}

@@ -98,6 +98,25 @@ const translations = {
     'general.cancel': 'Cancelar',
     'general.confirm': 'Confirmar',
     'general.close': 'Cerrar',
+
+    // SQL Result View
+    'sql_result.new_query': 'Nueva',
+    'sql_result.check_sql': 'Comprobar',
+    'sql_result.validating': 'Validando...',
+    'sql_result.valid_executable': 'SQL Válido y Ejecutable',
+    'sql_result.valid_not_executable': 'SQL Válido pero No Ejecutable',
+    'sql_result.invalid': 'SQL Inválido',
+    'sql_result.executable_original': 'SQL Ejecutable (original)',
+    'sql_result.not_executable_original': 'SQL No Ejecutable (original)',
+    'sql_result.view_error_details': 'Ver detalles del error',
+    'sql_result.validation_info': 'Información de validación',
+    'sql_result.valid_syntax': 'Sintaxis válida',
+    'sql_result.executable': 'Ejecutable',
+    'sql_result.time': 'Tiempo',
+    'sql_result.rows': 'Filas',
+    'sql_result.similar_example': 'Ejemplo similar utilizado en generación',
+    'sql_result.yes': 'Sí',
+    'sql_result.no': 'No',
   },
   
   en: {
@@ -194,6 +213,25 @@ const translations = {
     'general.cancel': 'Cancel',
     'general.confirm': 'Confirm',
     'general.close': 'Close',
+
+    // SQL Result View
+    'sql_result.new_query': 'New',
+    'sql_result.check_sql': 'Check',
+    'sql_result.validating': 'Validating...',
+    'sql_result.valid_executable': 'Valid and Executable SQL',
+    'sql_result.valid_not_executable': 'Valid but Non-Executable SQL',
+    'sql_result.invalid': 'Invalid SQL',
+    'sql_result.executable_original': 'Executable SQL (original)',
+    'sql_result.not_executable_original': 'Non-Executable SQL (original)',
+    'sql_result.view_error_details': 'View error details',
+    'sql_result.validation_info': 'Validation information',
+    'sql_result.valid_syntax': 'Valid syntax',
+    'sql_result.executable': 'Executable',
+    'sql_result.time': 'Time',
+    'sql_result.rows': 'Rows',
+    'sql_result.similar_example': 'Similar example used in generation',
+    'sql_result.yes': 'Yes',
+    'sql_result.no': 'No',
   }
 } as const;
 
