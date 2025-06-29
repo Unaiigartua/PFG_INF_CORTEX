@@ -52,7 +52,7 @@ export default function SQLResultView({
 
   const handleValidate = async () => {
     if (!token) {
-      alert("Token de autenticación requerido");
+      alert(t('sql_result.auth_required'));
       return;
     }
 
@@ -66,12 +66,12 @@ export default function SQLResultView({
         },
         body: JSON.stringify({
           sql_query: sqlCode,
-          question: result.question  // Añadir la pregunta original
+          question: result.question
         }),
       });
 
       if (!response.ok) {
-        throw new Error("Error al validar SQL");
+        throw new Error(t('sql_result.validation_error'));
       }
 
       const validationData = await response.json();
@@ -79,7 +79,7 @@ export default function SQLResultView({
       
     } catch (err) {
       console.error("Error al validar SQL:", err);
-      alert("Error al validar la consulta SQL");
+      alert(t('sql_result.validation_error'));
     } finally {
       setIsValidating(false);
     }
@@ -94,15 +94,15 @@ export default function SQLResultView({
       <div className="card">
         <div className="flex justify-between items-start mb-4">
           <h3 className="text-lg font-semibold text-[var(--color-primary)] mb-3">
-            Consulta Original
+            {t('sql_result.original_query')}
           </h3>
           <button
             onClick={onEditQuery}
             className="btn-ghost text-sm py-1 px-3"
-            title="Editar consulta"
+            title={t('sql_result.edit_query')}
           >
             <Edit3 className="icon-sm mr-1" />
-            Editar
+            {t('sql_result.edit')}
           </button>
         </div>
         
@@ -112,7 +112,7 @@ export default function SQLResultView({
 
         <div className="space-y-2">
           <h4 className="text-sm font-medium text-[var(--color-text-light)]">
-            Términos Validados:
+            {t('sql_result.validated_terms')}:
           </h4>
           <div className="flex flex-wrap gap-2">
             {validatedTerms.map((termGroup, index) => 
@@ -142,10 +142,10 @@ export default function SQLResultView({
       <div className="card">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-semibold text-[var(--color-secondary)]">
-            Consulta SQL Generada
+            {t('sql_result.generated_sql')}
           </h3>
           <div className="text-sm text-[var(--color-text-muted)]">
-            {result.attempts_count} intento{result.attempts_count !== 1 ? 's' : ''}
+            {result.attempts_count} {result.attempts_count === 1 ? t('sql_result.attempt') : t('sql_result.attempts')}
           </div>
         </div>
 
@@ -213,7 +213,6 @@ export default function SQLResultView({
                       </span>
                     </>
                   )}
-                  {/* Remover el tiempo de validación */}
                 </>
               ) : (
                 // Mostrar resultado original si no se ha validado
@@ -339,11 +338,11 @@ export default function SQLResultView({
               <details className="group">
                 <summary className="cursor-pointer text-sm font-medium text-[var(--color-secondary)] hover:text-[var(--color-secondary-dark)] transition-colors list-none flex items-center gap-2">
                   <ChevronDown className="icon-sm group-open:rotate-180 transition-transform" />
-                  {t('sql_result.similar_example')} (score: {(result.similar_example.score * 100).toFixed(1)}%)
+                  {t('sql_result.similar_example')} ({t('sql_result.score')}: {(result.similar_example.score * 100).toFixed(1)}%)
                 </summary>
                 <div className="mt-3 p-4 bg-[var(--color-secondary)]/5 border border-[var(--color-secondary)]/20 rounded-xl space-y-2">
                   <p className="text-sm font-medium text-[var(--color-text)]">
-                    Pregunta: {result.similar_example.question}
+                    {t('sql_result.example_question')}: {result.similar_example.question}
                   </p>
                   <pre className="text-xs font-mono text-[var(--color-text-muted)] bg-[var(--color-background)] p-2 rounded border overflow-x-auto">
 {result.similar_example.sql}

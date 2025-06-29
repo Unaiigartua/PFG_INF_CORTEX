@@ -11,7 +11,6 @@ def test_extract_entities_english(client, mock_medical_entities):
         assert "entities" in data
         assert len(data["entities"]) == 1
         assert data["entities"][0]["word"] == "diabetes"
-        # El modelo real usa "Disease_disorder" en lugar de "CONDITION"
         assert data["entities"][0]["entity_group"] in ["CONDITION", "Disease_disorder"]
 
 def test_extract_entities_spanish(client, mock_medical_entities):
@@ -40,5 +39,4 @@ def test_extract_entities_real_service(client):
     assert response.status_code == 200
     data = response.json()
     assert "entities" in data
-    # Con el servicio real, puede detectar múltiples entidades
     assert isinstance(data["entities"], list)
